@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 struct _Individu {
 	char *prenom;
 	char sexe;
@@ -11,23 +10,20 @@ struct _Individu {
 };
 typedef struct _Individu Individu;
 
-int mystrcmp (char *c1, char *c2){
+int mystrcmp(char *s, char *ch){
 	/**compare deux chaines de caracteres en ignorant la casse */
-	int t1 = strlen(c1);
-	int t2 = strlen(c2);
-	
-	if (t1 != t2){
-		return 0;
-	}
-	
-	for (int i=0;i<t1;i++){
-		if (c1[i] != c2[i]){
-			if(c1[i]-('A'-'a')!=c2[i] && c1[i] != c2[i]-('A'-'a')){
-				return 0;
-			}
+	int taille1 = strlen(s);
+	int taille2 = strlen(ch);
+	int taille = (taille1 > taille2 ? taille1 : taille2);
+	int i;
+	for(i = 0; i < taille; i++){
+		if((s[i] >= 'A' && s[i] <= 'Z' ? s[i]-'A'+'a' : s[i]) > (ch[i] >= 'A' && ch[i] <= 'Z' ? ch[i]-'A'+'a' : ch[i])){
+			return 1;
+		} else if ((s[i] >= 'A' && s[i] <= 'Z' ? s[i]-'A'+'a' : s[i]) < (ch[i] >= 'A' && ch[i] <= 'Z' ? ch[i]-'A'+'a' : ch[i])){
+			return -1;
 		}
 	}
-	return 1;
+	return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -46,7 +42,7 @@ void view (void){
 	/** affiche l'arbre en memoire, meme format que la sauvegarde */
 }
 
-void new (char *prenom, char sexe, char *prenom_pere, char *prenom_mere){
+void new (char *prenom, char* sexe, char *prenom_pere, char *prenom_mere){
 	/** ajouter un individu dans l'arbre */
 }
 
@@ -150,22 +146,139 @@ void cousins (char *prenom){
 //  					GESTION DES COMMANDES						  //
 ////////////////////////////////////////////////////////////////////////
 
+char **commande(char *cmd, int *new_nb_arg){
+	/** Retourne un tableau de string avec en premier le nom de la fonction demande par l'utilisateur
+		puis les arguments*/
+	int i,nb_arg=0,j=0,taille_mot=10,taille_arg=5;
+	
+	char **fct = malloc(sizeof(char*)*taille_arg);
+	for(i=0;i<taille_arg;i++){
+		fct[i] = (char *)malloc(sizeof(char)*taille_mot);
+	}
+	for(i=0;i<strlen(cmd);i++){
+		if(cmd[i] != ' '){
+			if(cmd[i] == '(' || cmd[i] == ','){
+				i++;
+				fct[nb_arg][j] = '\0';
+				if(j+1 < taille_mot){
+					fct[nb_arg] = (char *)realloc(fct[nb_arg],sizeof(char)*j);
+				}
+				nb_arg++;j=0;
+			}
+			if(cmd[i] == ')'){
+				fct[nb_arg][j] = '\0';
+				if(j+1 < taille_mot){
+					fct[nb_arg] = (char *)realloc(fct[nb_arg],sizeof(char)*j);
+				}
+				break;
+			}
+			fct[nb_arg][j] = cmd[i];
+			j++;
+			if(j+1 == taille_mot){
+				taille_mot *= 2;
+				fct[nb_arg] = (char *)realloc(fct[nb_arg],sizeof(char)*taille_mot);
+			}
+		}
+	}
+	if(nb_arg+1 < taille_arg){
+		fct = realloc(fct,sizeof(char*)*(nb_arg+1));
+		(*new_nb_arg) = nb_arg+1;
+	}
+	return fct;
+}
+
+void viderBuffer(){
+	int c=0;
+	while(c!='\n'&&c!=EOF)
+		c=getchar();
+}
+
 void interface (){
-	quit = 0;
-	while(!quit){
-		char *commande;
-		char *nom;
-		printf(">>");
-		scanf("%s",commande);
-		
-		switch commande{
-			////
+	int *nb_arg = malloc(sizeof(int));
+	*nb_arg = 5;
+	char *cmd_u = malloc(sizeof(char)*10);
+	char **ma_cmd = malloc(sizeof(char*)*(*nb_arg));
+	ma_cmd[0] = "NULL";
+	while(mystrcmp(ma_cmd[0],"exit")!=0){
+		scanf("%s",cmd_u);
+		ma_cmd=commande(cmd_u,nb_arg);
+		if(mystrcmp(ma_cmd[0], "load") == 0){
+			load(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "save") == 0){
+			save(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "view") == 0){
+			view();
+		}
+		else if(mystrcmp(ma_cmd[0], "new" ) == 0){
+			new(ma_cmd[1],ma_cmd[2],ma_cmd[3],ma_cmd[4]);
+		}
+		else if(mystrcmp(ma_cmd[0], "info") == 0){
+			info(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "mere") == 0){
+			mere(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "pere") == 0){
+			pere(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "parents") == 0){
+			parents(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "gdmeres") == 0){
+			gd_meres(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "gdperes") == 0){
+			gd_peres(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "gdparents") == 0){
+			gd_parents(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "ascendants") == 0){
+			ascendants(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "enfants") == 0){
+			enfants(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "petitsenfants") == 0){
+			petits_enfant(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "descendants") == 0){
+			descendants(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "partenaires") == 0){
+			partenaires(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "freres") == 0){
+			freres(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "soeurs") == 0){
+			soeurs(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "demifreres") == 0){
+			demi_freres(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "demisoeurs") == 0){
+			demi_soeurs(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "oncles") == 0){
+			oncles(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "tantes") == 0){
+			tantes(ma_cmd[1]);
+		}
+		else if(mystrcmp(ma_cmd[0], "cousins") == 0){
+			cousins(ma_cmd[1]);
+		}
+		else{
+			printf("Aucune option reconnue\n");
 		}
 	}
 }
 
 
 int main(void){
-	printf("%d\n",mystrcmp(c1,c2));
+	interface();
 	return 0;
 }
