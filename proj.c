@@ -66,7 +66,7 @@ void afficherIndividu(Individu *ind){
 		if(ind->pere == NULL){
 			printf(",\n");
 		} else {
-			printf("%s,%s",ind->pere->prenom,ind->mere->prenom);
+			printf("%s,%s\n",ind->pere->prenom,ind->mere->prenom);
 		}
 	}
 }
@@ -91,17 +91,61 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 		
 		l->premier = node;
 	} else {
-		ListNode *actuel = l->premier;
-		while(actuel->next != NULL){
-			actuel = actuel->next;
+		//Ajout en fin de chaine si pas de parents
+		if(prenom_pere == NULL){
+			ListNode *actuel = l->premier;
+			while(actuel->next != NULL){
+				actuel = actuel->next;
+			}
+			ListNode *node = malloc(sizeof(*node));
+			Individu *ind = initialisationIndividu();
+			ind->prenom = prenom;
+			ind->sexe = sexe;
+			node->individu = ind;
+			
+			actuel->next = node;
+		} else {
+			Individu *papa;
+			Individu *mama;
+			ListNode *actuel = l->premier;
+			ListNode *prec = actuel;
+			while(actuel != NULL){
+				if(mystrcmp(actuel->individu->prenom,prenom_pere) == 0){
+					papa = actuel->individu;
+					if(prec == actuel){
+						l->premier = l->premier->next;
+						actuel = l->premier;
+						prec = actuel;
+					} else {
+						prec->next = actuel->next;
+						actuel = prec;
+					}
+				}
+				if(mystrcmp(actuel->individu->prenom,prenom_mere) == 0){
+					mama = actuel->individu;
+					if(prec == actuel){
+						l->premier = l->premier->next;
+						actuel = l->premier;
+						prec = actuel;
+					} else {
+						prec->next = actuel->next;
+						actuel = prec;
+					}
+				}
+				prec = actuel;
+				actuel = actuel->next;
+			}
+			ListNode *node = malloc(sizeof(*node));
+			Individu *ind = initialisationIndividu();
+			ind->prenom = prenom;
+			ind->sexe = sexe;
+			ind->pere = papa;
+			ind->mere = mama;
+			node->individu = ind;
+			
+			node->next = actuel;
+			prec->next = node;
 		}
-		ListNode *node = malloc(sizeof(*node));
-		Individu *ind = initialisationIndividu();
-		ind->prenom = prenom;
-		ind->sexe = sexe;
-		node->individu = ind;
-		
-		actuel->next = node;
 	}	
 }
 
@@ -345,10 +389,13 @@ int main(void){
 	new(l,"Test3",'f',NULL,NULL);
 	new(l,"Test4",'m',NULL,NULL);
 	new(l,"Test5",'m',NULL,NULL);
-	view(l);
-	//new(l,"Test3",'m',NULL,NULL);
-	//new(l,"Test4",'f',NULL,NULL);
-	//new(l,"Test5",'m',NULL,NULL);
+	view(l);printf("\n");
+	new(l,"Parent",'m',"Test5","Test");
+	view(l);printf("\n");
+	new(l,"Parent2",'m',"Test2","Test4");
+	view(l);printf("\n");
+	new(l,"GP",'m',"Parent","Parent2");
+	view(l);printf("\n");
 	
 	//interface(indiv);
 	return 0;
