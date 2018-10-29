@@ -10,6 +10,15 @@ struct _Individu {
 };
 typedef struct _Individu Individu;
 
+typedef struct S_ListNode{
+	Individu *individu;
+	struct S_ListNode *next;
+} ListNode;
+
+typedef struct{
+	ListNode *premier;
+} List;
+
 int mystrcmp(char *s, char *ch){
 	/**compare deux chaines de caracteres en ignorant la casse */
 	int taille1 = strlen(s);
@@ -30,6 +39,19 @@ int mystrcmp(char *s, char *ch){
 //  				COMMANDES GESTION ARBRE							  //
 ////////////////////////////////////////////////////////////////////////
 
+Individu *initialisationIndividu(){
+	Individu *indiv = malloc(sizeof(*indiv));
+	indiv->prenom = NULL;
+	indiv->pere = NULL;
+	indiv->mere = NULL;
+}
+
+List *nouvelleListe(){
+	List *l = malloc(sizeof(*l));
+	l->premier = NULL;
+	return l;
+}
+
 void load (char *nom_fichier){
 	/** charge en memoire l'arbre stoqué dans le fichier 'nom_fichier' */
 }
@@ -38,12 +60,49 @@ void save (char *nom_fichier){
 	/** sauvegarde l'arbre en memoire dans le fichier 'nom_fichier' */
 }
 
-void view (void){
-	/** affiche l'arbre en memoire, meme format que la sauvegarde */
+void afficherIndividu(Individu *ind){
+	if(ind->prenom != NULL){
+		printf("%s:%c,",ind->prenom,ind->sexe);
+		if(ind->pere == NULL){
+			printf(",\n");
+		} else {
+			printf("%s,%s",ind->pere->prenom,ind->mere->prenom);
+		}
+	}
 }
 
-void new (char *prenom, char* sexe, char *prenom_pere, char *prenom_mere){
+void view (List *l){
+	/** affiche l'arbre en memoire, meme format que la sauvegarde */
+	ListNode *actuel = l->premier;
+	while(actuel != NULL){
+		afficherIndividu(actuel->individu);
+		actuel = actuel->next;
+	}
+}
+
+void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere){
 	/** ajouter un individu dans l'arbre */
+	if(l->premier == NULL){
+		ListNode *node = malloc(sizeof(*node));
+		Individu *ind = initialisationIndividu();
+		ind->prenom = prenom;
+		ind->sexe = sexe;
+		node->individu = ind;
+		
+		l->premier = node;
+	} else {
+		ListNode *actuel = l->premier;
+		while(actuel->next != NULL){
+			actuel = actuel->next;
+		}
+		ListNode *node = malloc(sizeof(*node));
+		Individu *ind = initialisationIndividu();
+		ind->prenom = prenom;
+		ind->sexe = sexe;
+		node->individu = ind;
+		
+		actuel->next = node;
+	}	
 }
 
 
@@ -187,13 +246,7 @@ char **commande(char *cmd, int *new_nb_arg){
 	return fct;
 }
 
-void viderBuffer(){
-	int c=0;
-	while(c!='\n'&&c!=EOF)
-		c=getchar();
-}
-
-void interface (){
+void interface (List *indiv){
 	int *nb_arg = malloc(sizeof(int));
 	*nb_arg = 5;
 	char *cmd_u = malloc(sizeof(char)*10);
@@ -202,83 +255,101 @@ void interface (){
 	while(mystrcmp(ma_cmd[0],"exit")!=0){
 		scanf("%s",cmd_u);
 		ma_cmd=commande(cmd_u,nb_arg);
-		if(mystrcmp(ma_cmd[0], "load") == 0){
-			load(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "save") == 0){
-			save(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "view") == 0){
-			view();
-		}
-		else if(mystrcmp(ma_cmd[0], "new" ) == 0){
-			new(ma_cmd[1],ma_cmd[2],ma_cmd[3],ma_cmd[4]);
-		}
-		else if(mystrcmp(ma_cmd[0], "info") == 0){
-			info(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "mere") == 0){
-			mere(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "pere") == 0){
-			pere(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "parents") == 0){
-			parents(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "gdmeres") == 0){
-			gd_meres(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "gdperes") == 0){
-			gd_peres(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "gdparents") == 0){
-			gd_parents(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "ascendants") == 0){
-			ascendants(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "enfants") == 0){
-			enfants(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "petitsenfants") == 0){
-			petits_enfant(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "descendants") == 0){
-			descendants(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "partenaires") == 0){
-			partenaires(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "freres") == 0){
-			freres(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "soeurs") == 0){
-			soeurs(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "demifreres") == 0){
-			demi_freres(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "demisoeurs") == 0){
-			demi_soeurs(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "oncles") == 0){
-			oncles(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "tantes") == 0){
-			tantes(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "cousins") == 0){
-			cousins(ma_cmd[1]);
-		}
-		else{
-			printf("Aucune option reconnue\n");
+		
+		if(mystrcmp(ma_cmd[0], "view") == 0){
+			view(indiv);
+		} else if (mystrcmp(ma_cmd[0], "exit") == 0){
+			printf("Fin de l'application\n");
+		} else if((*nb_arg) <= 1){
+			printf("Pas assez d'arguments\n");
+		} else {
+			if(mystrcmp(ma_cmd[0], "load") == 0){
+				load(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "save") == 0){
+				save(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "new" ) == 0){
+				new(indiv, ma_cmd[1],ma_cmd[2][0],ma_cmd[3],ma_cmd[4]);
+			}
+			else if(mystrcmp(ma_cmd[0], "info") == 0){
+				info(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "mere") == 0){
+				mere(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "pere") == 0){
+				pere(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "parents") == 0){
+				parents(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "gdmeres") == 0){
+				gd_meres(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "gdperes") == 0){
+				gd_peres(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "gdparents") == 0){
+				gd_parents(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "ascendants") == 0){
+				ascendants(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "enfants") == 0){
+				enfants(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "petitsenfants") == 0){
+				petits_enfant(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "descendants") == 0){
+				descendants(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "partenaires") == 0){
+				partenaires(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "freres") == 0){
+				freres(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "soeurs") == 0){
+				soeurs(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "demifreres") == 0){
+				demi_freres(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "demisoeurs") == 0){
+				demi_soeurs(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "oncles") == 0){
+				oncles(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "tantes") == 0){
+				tantes(ma_cmd[1]);
+			}
+			else if(mystrcmp(ma_cmd[0], "cousins") == 0){
+				cousins(ma_cmd[1]);
+			}
+			else{
+				if(mystrcmp(ma_cmd[0], "exit") != 0)
+					printf("Aucune option reconnue\n");
+			}
 		}
 	}
 }
 
 
 int main(void){
-	interface();
+	List *l = nouvelleListe();
+	new(l,"Test",'f',NULL,NULL);
+	new(l,"Test2",'m',NULL,NULL);
+	new(l,"Test3",'f',NULL,NULL);
+	new(l,"Test4",'m',NULL,NULL);
+	new(l,"Test5",'m',NULL,NULL);
+	view(l);
+	//new(l,"Test3",'m',NULL,NULL);
+	//new(l,"Test4",'f',NULL,NULL);
+	//new(l,"Test5",'m',NULL,NULL);
+	
+	//interface(indiv);
 	return 0;
 }
