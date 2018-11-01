@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 struct _Individu {
 	char *prenom;
@@ -10,14 +11,21 @@ struct _Individu {
 };
 typedef struct _Individu Individu;
 
-typedef struct S_ListNode{
+struct S_ListNode{
 	Individu *individu;
 	struct S_ListNode *next;
-} ListNode;
+}; typedef struct S_ListNode ListNode;
 
 typedef struct{
 	ListNode *premier;
 } List;
+
+struct _FileIndiv{
+	Individu **file;
+	int tmax;
+	int nbelemt;
+}; typedef struct _FileIndiv FileIndiv;
+
 
 int mystrcmp(char *s, char *ch){
 	/**compare deux chaines de caracteres en ignorant la casse */
@@ -35,15 +43,39 @@ int mystrcmp(char *s, char *ch){
 	return 0;
 }
 
-////////////////////////////////////////////////////////////////////////
-//  				COMMANDES GESTION ARBRE							  //
-////////////////////////////////////////////////////////////////////////
+FileIndiv initFile(){
+	FileIndiv res;
+	res.tmax = 10;
+	res.nbelemt = 0;
+	res.file = malloc(10*sizeof(Individu));
+	return res;
+}
+
+void enfile (FileIndiv *f, Individu *i){
+	f->nbelemt++;
+	if (f->nbelemt > f->tmax){
+		f->tmax = 2*(f->tmax);
+		f->file = realloc(f->file,f->tmax*sizeof(Individu));
+	}
+	f->file[f->nbelemt-1]=i;
+}
+
+
+Individu *defile(FileIndiv *f){
+	Individu *res = f->file[0];
+	for (int i=0;i<f->nbelemt-1;i++){
+		f->file[i] = f->file[i+1];
+	}
+	f->nbelemt--;
+	return res;
+}
 
 Individu *initialisationIndividu(){
 	Individu *indiv = malloc(sizeof(*indiv));
 	indiv->prenom = NULL;
 	indiv->pere = NULL;
 	indiv->mere = NULL;
+	return indiv;
 }
 
 List *nouvelleListe(){
@@ -52,9 +84,10 @@ List *nouvelleListe(){
 	return l;
 }
 
-void load (char *nom_fichier){
-	/** charge en memoire l'arbre stoqué dans le fichier 'nom_fichier' */
-}
+////////////////////////////////////////////////////////////////////////
+//  				COMMANDES GESTION ARBRE							  //
+////////////////////////////////////////////////////////////////////////
+
 
 void save (char *nom_fichier){
 	/** sauvegarde l'arbre en memoire dans le fichier 'nom_fichier' */
@@ -71,25 +104,47 @@ void afficherIndividu(Individu *ind){
 	}
 }
 
-void view (List *l){
+void view (List l){
 	/** affiche l'arbre en memoire, meme format que la sauvegarde */
-	ListNode *actuel = l->premier;
-	while(actuel != NULL){
-		afficherIndividu(actuel->individu);
-		actuel = actuel->next;
+	FileIndiv f = initFile();
+	
+	ListNode *cur = l.premier;
+	while(cur->next!=NULL){
+		enfile(&f,cur->individu);
+		cur = cur->next;
 	}
+	while (f.nbelemt > 0){
+		FileIndiv newval = initFile();
+		for (int i=0; i<f.nbelemt;i++){
+			afficherIndividu(f.file[i]);
+			if (f.file[i]->pere != NULL){
+				enfile(&newval, f.file[i]->pere);
+			}
+			if (f.file[i]->mere != NULL){
+				enfile(&newval, f.file[i]->mere);
+			}
+		}
+		while(f.nbelemt>0){
+			defile(&f);
+		}
+		for (int i=0;i<newval.nbelemt;i++){
+			enfile(&f,defile(&newval));
+		}
+	}	
 }
 
 void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere){
 	/** ajouter un individu dans l'arbre */
 	if(l->premier == NULL){
 		ListNode *node = malloc(sizeof(*node));
+		node->next = NULL;
 		Individu *ind = initialisationIndividu();
 		ind->prenom = prenom;
 		ind->sexe = sexe;
 		node->individu = ind;
 		
 		l->premier = node;
+		
 	} else {
 		//Ajout en fin de chaine si pas de parents
 		if(prenom_pere == NULL){
@@ -98,6 +153,7 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 				actuel = actuel->next;
 			}
 			ListNode *node = malloc(sizeof(*node));
+			node->next = NULL;
 			Individu *ind = initialisationIndividu();
 			ind->prenom = prenom;
 			ind->sexe = sexe;
@@ -136,6 +192,7 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 				actuel = actuel->next;
 			}
 			ListNode *node = malloc(sizeof(*node));
+			node->next = NULL;
 			Individu *ind = initialisationIndividu();
 			ind->prenom = prenom;
 			ind->sexe = sexe;
@@ -146,9 +203,94 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 			node->next = actuel;
 			prec->next = node;
 		}
-	}	
+	}
 }
 
+
+List *load (char *nom_fichier){
+	/** charge en memoire l'arbre stoqué dans le fichier 'nom_fichier' */
+	
+	FILE *fichier = fopen(nom_fichier,"r");
+	
+	List *res = nouvelleListe(); //init la liste chaine qui sert de memoire
+	int fini=0;
+	char c;
+	do{
+	//parcour integral du fichier	
+		int done = 0;
+		while (!done && c != EOF){
+			//parcour de la ligne
+
+			char *nom = malloc(sizeof(char)*2);
+			char *nom_pere = malloc(sizeof(char)*2);
+			char *nom_mere = malloc(sizeof(char)*2);
+			char sexe;
+
+			int end = 0;
+			
+			
+			while (c!=':' && c != EOF){
+				//copie du deuxieme parametre
+				/**/
+				nom[end]=c;
+				end++;
+				nom=realloc(nom,(sizeof(char)*end+1));
+				c = fgetc(fichier);
+			}
+			nom[end] = '\0';
+			
+			end = 0;
+			
+			
+			while (c!=',' && c != EOF){
+				sexe = c;
+				c = fgetc(fichier);
+			}
+			end=0;
+			c = fgetc(fichier);
+			while (c!=',' && c != EOF){
+				//copie du troisieme parametre
+				/**/
+				
+				nom_pere[end]=c;
+				end++;
+				nom_pere=realloc(nom_pere,(sizeof(char)*end+1));
+				c = fgetc(fichier);
+				if (strlen(nom_pere)==0){nom_pere = NULL;};
+			}
+			nom_pere[end] = '\0';
+			
+			end = 0;
+			while (c!='\n' && c != EOF){
+				//copie du dernier
+				/**/
+				
+		if (c == EOF){
+			c = fgetc(fichier);
+		}
+				c = fgetc(fichier);
+				if (c != ','){
+					nom_mere[end]=c;
+					end++;
+					nom_mere=realloc(nom_mere,(sizeof(char)*end+1));
+				}
+				if (strlen(nom_mere)==0){nom_mere = NULL;};
+			}
+			nom_mere[end] = '\0';
+			end = 0;
+			//printf("%s %c %s %s\n",nom,sexe,nom_pere, nom_mere);
+			new(res,nom,sexe,nom_pere,nom_mere);
+			done=1;
+		}
+		if (c != EOF){
+			c = fgetc(fichier);
+		}
+		
+	}while (c != EOF);
+	fclose(fichier);
+	//view(res);
+	return res;
+}
 
 
 
@@ -301,7 +443,7 @@ void interface (List *indiv){
 		ma_cmd=commande(cmd_u,nb_arg);
 		
 		if(mystrcmp(ma_cmd[0], "view") == 0){
-			view(indiv);
+			//view(indiv);
 		} else if (mystrcmp(ma_cmd[0], "exit") == 0){
 			printf("Fin de l'application\n");
 		} else if((*nb_arg) <= 1){
@@ -383,19 +525,33 @@ void interface (List *indiv){
 
 
 int main(void){
+	
+	char *fi = "pok.txt";
+	List *meme = load(fi);
+	
+	
+	
 	List *l = nouvelleListe();
 	new(l,"Test",'f',NULL,NULL);
 	new(l,"Test2",'m',NULL,NULL);
-	new(l,"Test3",'f',NULL,NULL);
+	new(l,"Test3",'f',"Test2","Test");
 	new(l,"Test4",'m',NULL,NULL);
 	new(l,"Test5",'m',NULL,NULL);
+	
+	view(*l);
+	
+	
+	/*
 	view(l);printf("\n");
 	new(l,"Parent",'m',"Test5","Test");
 	view(l);printf("\n");
 	new(l,"Parent2",'m',"Test2","Test4");
 	view(l);printf("\n");
 	new(l,"GP",'m',"Parent","Parent2");
+	* 
 	view(l);printf("\n");
+	*/
+	
 	
 	//interface(indiv);
 	return 0;
