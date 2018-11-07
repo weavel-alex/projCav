@@ -343,59 +343,54 @@ void load (char *nom_fichier, List *l){
 	/** charge en memoire l'arbre stocké dans le fichier 'nom_fichier' */
 	FILE *fichier = ouvrirFichier(nom_fichier,"r");
 	if(fichier != NULL){
-		int taille_arg = 4,taille = 20, ptr = 0, c = 0, end = 0;
+		int c = 0, taille_mot = 20, ptr = 0, fin_mot = 0;
+		char **indv = malloc(sizeof(char*)*4);
 		int i;
-		char **fct = malloc(sizeof(char*)*taille_arg);
-		for(i=0;i<taille_arg;i++){
-			fct[i] = (char *)malloc(sizeof(char)*taille);
+		for(i=0;i<4;i++){
+			indv[i] = (char *)malloc(sizeof(char)*taille_mot);
 		}
 		for(c = fgetc(fichier); !feof(fichier); c = fgetc(fichier)){
 			//Creation du mot
 			if(estLettre(c)){
-				fct[ptr][end] = c;
-				end++;
-				if(end == taille){
-					taille *= 2;
-					fct[ptr] = realloc(fct[ptr],(sizeof(char)*taille));
+				indv[ptr][fin_mot] = c;
+				fin_mot++;
+				if(fin_mot == taille_mot){
+					taille_mot *= 2;
+					indv[ptr] = realloc(indv[ptr],(sizeof(char)*taille_mot));
 				}
-			}
-			if(c == ':'){
-				if(end != taille){
-					fct[ptr] = realloc(fct[ptr],(sizeof(char)*end));
-					taille = 20;
-				}
-				fct[ptr][end] = '\0';
-				end = 0;ptr++;
-			} else if(c == ','){
-				if(end == 0){
-					fct[ptr] = NULL;
-				} else {
-					if(end != taille){
-						fct[ptr] = realloc(fct[ptr],(sizeof(char)*end));
-						taille = 20;
+			} else {
+				//Si un autre caractere
+				if(fin_mot != 0){
+					//Ecriture de la fin du mot
+					indv[ptr][fin_mot] = '\0';
+					if(fin_mot != taille_mot){
+						indv[ptr] = realloc(indv[ptr],(sizeof(char)*fin_mot));
+						taille_mot = 20;
 					}
-					fct[ptr][end] = '\0';
-					ptr++;end = 0;
-				}
-			} else if(c == '\n'){
-				if(end == 0){
-					fct[ptr] = NULL;
-				}
-				if(end != taille){
-					fct[ptr] = realloc(fct[ptr],(sizeof(char)*end));
-					taille = 20;
-				}
-				fct[ptr][end] = '\0';
-				end = 0;ptr=0;
-				if(fct[2] != NULL){
-					printf("-----%s %c %s %s\n",fct[0],fct[1][0],fct[2],fct[3]);
 				} else {
-					printf("-----%s %c NULL NULL\n",fct[0],fct[1][0]);
+					//Si on a rien alors NULL pour les parents
+					indv[ptr] = NULL;
+				}				
+				ptr++;fin_mot = 0;
+				if(ptr == 4){
+					//On cree l'individu
+					new(l,indv[0],indv[1][0],indv[2],indv[3]);
+					ptr=0;
+					//On realloc pour ne pas avoir de soucis de memoire apres
+					for(i=0;i<4;i++){
+						indv[i] = NULL;
+						indv[i] = realloc(indv[i],(sizeof(char)*taille_mot));
+					}
 				}
-				new(l,fct[0],fct[1][0],fct[2],fct[3]);
 			}
 		}
+		for(i=0;i<4;i++){
+			free(indv[i]);
+		}
+		free(indv);
 		fermerFichier(fichier);
+	} else {
+		printf("Le fichier %s n'existe pas.\n",nom_fichier);
 	}
 }
 
@@ -675,7 +670,7 @@ int main(void){
 	new(l,"E",'f',"C","D");
 	view(l);printf("\n");
 	*/
-	
+	/*
 	new(l,"A",'m',NULL,NULL);
 	new(l,"B",'f',NULL,NULL);
 	new(l,"C",'m',"A","B");
@@ -685,7 +680,7 @@ int main(void){
 	new(l,"G",'m',"C","D");
 	new(l,"H",'m',"C","E");
 	view(l);printf("\n");
-	
+	*/
 	/*char **ma_cmd;
 	char c[19] = "new(bru,f,tre,pro)";
 	int *t = malloc(sizeof(int));*t=5;
@@ -699,8 +694,8 @@ int main(void){
 	}*/
 	
 	//interface(l);
-	save("test.txt",l);
-	//load("test.txt",l);
-	//view(l);
+	//save("test.txt",l);
+	load("test.txt",l);
+	view(l);
 	return 0;
 }
