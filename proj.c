@@ -49,33 +49,14 @@ Individu *initialisationIndividu(){
 }
 
 List *nouvelleListe(){
-	List *l = malloc(sizeof(*l));
+	List *l = NULL;
+	l = malloc(sizeof(*l));
 	l->premier = NULL;
 	return l;
 }
 
-void load (char *nom_fichier){
-	/** charge en memoire l'arbre stocké dans le fichier 'nom_fichier' */
-}
-
-void save (char *nom_fichier){
-	/** sauvegarde l'arbre en memoire dans le fichier 'nom_fichier' */
-}
-
-void afficherIndividu(Individu *ind){
-	if(ind->prenom != NULL){
-		printf("%s:%c,",ind->prenom,ind->sexe);
-		if(ind->pere == NULL){
-			printf(",\n");
-		} else {
-			printf("%s,%s\n",ind->pere->prenom,ind->mere->prenom);
-		}
-	}
-}
-
 Individu *copieIndividu(Individu *ind){
 	Individu *copie = initialisationIndividu();
-	copie->prenom = NULL;
 	copie->prenom = malloc(sizeof(char)*strlen(ind->prenom));
 	strcpy(copie->prenom,ind->prenom);
 	copie->sexe = ind->sexe;
@@ -85,15 +66,13 @@ Individu *copieIndividu(Individu *ind){
 }
 
 Individu **toutLesIndividus (List *l, int *taille){
-	/** affiche l'arbre en memoire, meme format que la sauvegarde */
+	/** stocke l'arbre en memoire */
 	int taille_max = 20;
 	Individu **tab = malloc(sizeof(*tab)*taille_max);
 	ListNode *actuel = l->premier;
 	*taille = 0;
 	//Recupere les individus dans la liste chainee
 	while(actuel != NULL){
-		//printf("%d:%s\n",i,actuel->individu->prenom);
-		tab[(*taille)] = NULL;
 		tab[(*taille)] = malloc(sizeof(Individu));
 		tab[(*taille)] = copieIndividu(actuel->individu);
 		(*taille)++;
@@ -115,7 +94,6 @@ Individu **toutLesIndividus (List *l, int *taille){
 			}
 			//S'il ne l'est pas, on l'ajoute
 			if(!estDoublon){
-				tab[(*taille)] = NULL;
 				tab[(*taille)] = malloc(sizeof(Individu));
 				tab[(*taille)] = copieIndividu(tab[j]->pere);
 				(*taille)++;
@@ -137,7 +115,6 @@ Individu **toutLesIndividus (List *l, int *taille){
 			}
 			//S'il ne l'est pas, on l'ajoute
 			if(!estDoublon){
-				tab[(*taille)] = NULL;
 				tab[(*taille)] = malloc(sizeof(Individu));
 				tab[(*taille)] = copieIndividu(tab[j]->mere);
 				(*taille)++;
@@ -153,6 +130,49 @@ Individu **toutLesIndividus (List *l, int *taille){
 	return tab;
 }
 
+FILE* ouvrirFichier(char* nom, char* option){
+	FILE* fichier = NULL;
+	fichier = fopen(nom,option);
+	return fichier;
+}
+
+void fermerFichier(FILE* fichier){
+	fclose(fichier);
+}
+
+void save (char *nom_fichier,List *l){
+	/** sauvegarde l'arbre en memoire dans le fichier 'nom_fichier' */
+	FILE* fichierD = fopen(nom_fichier,"a");
+	if(fichierD != NULL){
+		remove(nom_fichier);
+	}
+	FILE *fichier = ouvrirFichier(nom_fichier,"a");
+	if(fichier != NULL){
+		int *taille = malloc(sizeof(int));
+		Individu **tab = toutLesIndividus(l, taille);
+		int i;
+		for(i=(*taille)-1;i>=0;i--){
+			if(tab[i]->pere != NULL){
+				fprintf(fichier,"%s:%c,%s,%s\n",tab[i]->prenom,tab[i]->sexe,tab[i]->pere->prenom,tab[i]->mere->prenom);
+			} else {
+				fprintf(fichier,"%s:%c,,\n",tab[i]->prenom,tab[i]->sexe);
+			}
+		}
+		fermerFichier(fichier);
+	}
+}
+
+void afficherIndividu(Individu *ind){
+	if(ind->prenom != NULL){
+		printf("%s:%c,",ind->prenom,ind->sexe);
+		if(ind->pere == NULL){
+			printf(",\n");
+		} else {
+			printf("%s,%s\n",ind->pere->prenom,ind->mere->prenom);
+		}
+	}
+}
+
 void view (List *l){
 	int *taille = malloc(sizeof(int));
 	Individu **tab = toutLesIndividus(l, taille);
@@ -165,10 +185,8 @@ void view (List *l){
 void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere){
 	/** ajouter un individu dans l'arbre */
 	if(l->premier == NULL){
-		ListNode *node = NULL;
-		node = malloc(sizeof(*node));
+		ListNode *node = malloc(sizeof(*node));
 		Individu *ind = initialisationIndividu();
-		ind->prenom = NULL;
 		ind->prenom = malloc(sizeof(char)*strlen(prenom));
 		strcpy(ind->prenom,prenom);
 		ind->sexe = sexe;
@@ -177,15 +195,14 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 		l->premier = node;
 	} else {
 		//Ajout en fin de chaine si pas de parents
+		//Verifie que le pere car s'il n'a pas de pere il n'aura pas de mere
 		if(prenom_pere == NULL){
 			ListNode *actuel = l->premier;
 			while(actuel->next != NULL){
 				actuel = actuel->next;
 			}
-			ListNode *node = NULL;
-			node = malloc(sizeof(*node));
+			ListNode *node = malloc(sizeof(*node));
 			Individu *ind = initialisationIndividu();
-			ind->prenom = NULL;
 			ind->prenom = malloc(sizeof(char)*strlen(prenom));
 			strcpy(ind->prenom,prenom);
 			ind->sexe = sexe;
@@ -193,56 +210,74 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 			
 			actuel->next = node;
 		} else {
+			int erreur = 0;
+			int estModifiee;
 			int estSeul = 0;
 			Individu *papa = NULL;
 			Individu *mama = NULL;
 			ListNode *actuel = l->premier;
 			ListNode *prec = actuel;
+			//Verif dans la liste chainée
 			while(actuel != NULL){
+				estModifiee = 0;
 				if(mystrcmp(actuel->individu->prenom,prenom_pere) == 0){
-					if(actuel->individu->sexe != 'm'){
+					if(actuel->individu->sexe != 'm' && !erreur){
 						printf("Erreur de sexe pour le pere\n");
-						exit(1);
+						printf("Ajout annulé\n");
+						erreur = 1;
 					}
-					papa = actuel->individu;
-					if(prec == actuel){
-						//Si on doit enlever le tete
-						if(l->premier->next == NULL){
-							//Pour ne pas perdre le liste chainee
-							estSeul = 1;
+					if(!erreur){
+						papa = actuel->individu;
+						if(prec == actuel){
+							//Si on doit enlever le tete
+							if(l->premier->next == NULL){
+								//Si un seul element dans la liste chainée, pour ne pas perdre le liste chainee
+								estSeul = 1;
+							} else {
+								//Si pls noeud on remplace la tete
+								l->premier = l->premier->next;
+								actuel = l->premier;
+								prec = actuel;
+							}
 						} else {
-							//Si pls noeud on remplace la tete
-							l->premier = l->premier->next;
-							actuel = l->premier;
-							prec = actuel;
+							//On enleve normalement le noeud
+							prec->next = actuel->next;
+							actuel = prec;
 						}
-					} else {
-						//On enleve normalement le noeud
-						prec->next = actuel->next;
-						actuel = prec;
 					}
 				}
 				if(mystrcmp(actuel->individu->prenom,prenom_mere) == 0){
-					if(actuel->individu->sexe != 'f'){
+					if(actuel->individu->sexe != 'f' && !erreur){
 						printf("Erreur de sexe pour la mere\n");
-						exit(1);
+						printf("Ajout annulé\n");
+						erreur = 1;
 					}
-					mama = actuel->individu;
-					if(prec == actuel){
-						if(l->premier->next == NULL){
-							estSeul = 1;
+					if(!erreur){
+						mama = actuel->individu;
+						if(prec == actuel){
+							if(l->premier->next == NULL){
+								estSeul = 1;
+							} else {
+								l->premier = l->premier->next;
+								actuel = l->premier;
+								prec = actuel;
+								estModifiee = 1;
+							}
 						} else {
-							l->premier = l->premier->next;
-							actuel = l->premier;
-							prec = actuel;
+							prec->next = actuel->next;
+							actuel = prec;
+							estModifiee = 1;
 						}
-					} else {
-						prec->next = actuel->next;
-						actuel = prec;
 					}
 				}
-				prec = actuel;
-				actuel = actuel->next;
+				if(!estModifiee){
+					prec = actuel;
+					actuel = actuel->next;
+				}
+			}
+			if(erreur){
+				printf("Erreur detecter pendant l'ajout\n");
+				return;
 			}
 			//Si le parent rechercher n'est pas dans la liste chainée racine
 			//On parcours les parents pour le trouver
@@ -270,16 +305,14 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 				printf("Aucun individu trouvé pour %s\n",prenom_mere);
 			}
 			//On ajoute notre nouveau noeud a liste
-			ListNode *node = NULL;
-			node = malloc(sizeof(*node));
+			ListNode *node = malloc(sizeof(*node));
 			Individu *ind = initialisationIndividu();
-			ind->prenom = NULL;
 			ind->prenom = malloc(sizeof(char)*strlen(prenom));
 			strcpy(ind->prenom,prenom);
 			ind->sexe = sexe;
 			ind->pere = papa;
-			
 			ind->mere = mama;
+			
 			node->individu = ind;
 			
 			node->next = actuel;
@@ -294,7 +327,77 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 	}	
 }
 
+int estMinuscule(char c){
+	return (c >= 'a' && c <= 'z');
+}
 
+int estMajuscule(char c){
+	return (c >= 'A' && c <= 'Z');
+}
+
+int estLettre(char c){
+	return estMajuscule(c) || estMinuscule(c);
+}
+
+void load (char *nom_fichier, List *l){
+	/** charge en memoire l'arbre stocké dans le fichier 'nom_fichier' */
+	FILE *fichier = ouvrirFichier(nom_fichier,"r");
+	if(fichier != NULL){
+		int taille_arg = 4,taille = 20, ptr = 0, c = 0, end = 0;
+		int i;
+		char **fct = malloc(sizeof(char*)*taille_arg);
+		for(i=0;i<taille_arg;i++){
+			fct[i] = (char *)malloc(sizeof(char)*taille);
+		}
+		for(c = fgetc(fichier); !feof(fichier); c = fgetc(fichier)){
+			//Creation du mot
+			if(estLettre(c)){
+				fct[ptr][end] = c;
+				end++;
+				if(end == taille){
+					taille *= 2;
+					fct[ptr] = realloc(fct[ptr],(sizeof(char)*taille));
+				}
+			}
+			if(c == ':'){
+				if(end != taille){
+					fct[ptr] = realloc(fct[ptr],(sizeof(char)*end));
+					taille = 20;
+				}
+				fct[ptr][end] = '\0';
+				end = 0;ptr++;
+			} else if(c == ','){
+				if(end == 0){
+					fct[ptr] = NULL;
+				} else {
+					if(end != taille){
+						fct[ptr] = realloc(fct[ptr],(sizeof(char)*end));
+						taille = 20;
+					}
+					fct[ptr][end] = '\0';
+					ptr++;end = 0;
+				}
+			} else if(c == '\n'){
+				if(end == 0){
+					fct[ptr] = NULL;
+				}
+				if(end != taille){
+					fct[ptr] = realloc(fct[ptr],(sizeof(char)*end));
+					taille = 20;
+				}
+				fct[ptr][end] = '\0';
+				end = 0;ptr=0;
+				if(fct[2] != NULL){
+					printf("-----%s %c %s %s\n",fct[0],fct[1][0],fct[2],fct[3]);
+				} else {
+					printf("-----%s %c NULL NULL\n",fct[0],fct[1][0]);
+				}
+				new(l,fct[0],fct[1][0],fct[2],fct[3]);
+			}
+		}
+		fermerFichier(fichier);
+	}
+}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -447,44 +550,50 @@ char **commande(char *cmd, int *new_nb_arg){
 			}
 		}
 	}
-	if(nb_arg+1 < taille_arg){
-		fct = realloc(fct,sizeof(char*)*(nb_arg+1));
-		(*new_nb_arg) = nb_arg+1;
+	//Met les autres arg a NULL
+	int k;
+	for(k=nb_arg+1;k<taille_arg;k++){
+		fct[k]=NULL;
 	}
+	(*new_nb_arg) = nb_arg+1;
 	return fct;
 }
 
 void interface (List *indiv){
 	int *nb_arg = malloc(sizeof(int));
 	*nb_arg = 5;
-	char *cmd_u = malloc(sizeof(char)*10);
+	char *cmd_u = malloc(sizeof(char));
 	char **ma_cmd = malloc(sizeof(char*)*(*nb_arg));
 	ma_cmd[0] = "NULL";
 	while(mystrcmp(ma_cmd[0],"exit")!=0){
+		printf(">> ");
 		scanf("%s",cmd_u);
 		ma_cmd=commande(cmd_u,nb_arg);
-		
 		if(mystrcmp(ma_cmd[0], "view") == 0){
 			view(indiv);
 		} else if (mystrcmp(ma_cmd[0], "exit") == 0){
 			printf("Fin de l'application\n");
 		} else if((*nb_arg) <= 1){
-			printf("Pas assez d'arguments\n");
+			printf("Commande invalide\n");
+			//Vider le buffer
+			int c = 0;
+			while (c != '\n' && c != EOF)
+			{
+				c = getchar();
+			}
+			//fin vider buffer
 		} else {
 			if(mystrcmp(ma_cmd[0], "load") == 0){
-				load(ma_cmd[1]);
+				load(ma_cmd[1],indiv);
 			}
 			else if(mystrcmp(ma_cmd[0], "save") == 0){
-				save(ma_cmd[1]);
+				save(ma_cmd[1],indiv);
 			}
 			else if(mystrcmp(ma_cmd[0], "new" ) == 0){
-				if((*nb_arg) == 5){
-					new(indiv, ma_cmd[1],ma_cmd[2][0],ma_cmd[3],ma_cmd[4]);
-				}
-				if((*nb_arg) == 2){
-					new(indiv, ma_cmd[1],ma_cmd[2][0],NULL,NULL);
-				} else {
+				if((*nb_arg) < 3 || (*nb_arg) == 4){
 					printf("Commande non valide, probleme de parametre\n");
+				} else {
+					new(indiv, ma_cmd[1],ma_cmd[2][0],ma_cmd[3],ma_cmd[4]);
 				}
 			}
 			else if(mystrcmp(ma_cmd[0], "info") == 0){
@@ -568,22 +677,30 @@ int main(void){
 	*/
 	
 	new(l,"A",'m',NULL,NULL);
-	//view(l);printf("\n");
 	new(l,"B",'f',NULL,NULL);
-	//view(l);printf("\n");
 	new(l,"C",'m',"A","B");
-	//view(l);printf("\n");
 	new(l,"D",'f',NULL,NULL);
-	//view(l);printf("\n");
 	new(l,"E",'f',NULL,NULL);
-	//view(l);printf("\n");
 	new(l,"F",'m',"C","D");
-	//view(l);printf("\n");
 	new(l,"G",'m',"C","D");
-	//view(l);printf("\n");
 	new(l,"H",'m',"C","E");
 	view(l);printf("\n");
 	
-	//interface(indiv);
+	/*char **ma_cmd;
+	char c[19] = "new(bru,f,tre,pro)";
+	int *t = malloc(sizeof(int));*t=5;
+	ma_cmd=commande(c,t);
+	int i;
+	for(i=0;i<5;i++){
+		if(ma_cmd[i] == NULL)
+			printf("NULL\n");
+		else	
+			printf("%s\n",ma_cmd[i]);
+	}*/
+	
+	//interface(l);
+	save("test.txt",l);
+	//load("test.txt",l);
+	//view(l);
 	return 0;
 }
