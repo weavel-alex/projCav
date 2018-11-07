@@ -706,8 +706,12 @@ int main(void){
 	new(l,"F",'m',"C","D");
 	new(l,"G",'m',"C","D");
 	new(l,"H",'m',"C","E");
+	new(l,"Z",'m',NULL,NULL);
+	new(l,"W",'f',NULL,NULL);
+	new(l,"Y",'f',"Z","W");
 	view(l);printf("\n");
 	*/
+	
 	/*char **ma_cmd;
 	char c[19] = "new(bru,f,tre,pro)";
 	int *t = malloc(sizeof(int));*t=5;
