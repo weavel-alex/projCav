@@ -1,0 +1,8 @@
+b:f,,
+a:m,,
+e:f,,
+d:f,,
+c:m,a,b
+h:m,c,e
+g:m,c,d
+f:m,c,d
