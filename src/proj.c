@@ -409,46 +409,137 @@ void load (char *nom_fichier, List *l){
 	}
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 //  		COMMANDES D'INFO ET RECHERCHES DANS L'ARBRE				  //
 ////////////////////////////////////////////////////////////////////////
 
-void info(char *prenom){
+int existe(Individu **l, int taille, char *prenom){
+	for(int i=0;i<taille;i++){
+		if(mystrcmp(l[i]->prenom,prenom)==0){
+			return 1;
+		}
+	}
+	return 0;
+}
+
+Individu *info(Individu **l, int taille, char *prenom){
 	/** affiche prenom sexe pere mere de l'individu */
-	return;
+	int i;
+	for(i=0;i<taille;i++){
+		if(mystrcmp(l[i]->prenom,prenom)==0){
+			afficherIndividu(l[i]);
+		}
+	}
+	
+	return l[i];
 }
 
-void pere(char *prenom){
+void pere(Individu **l, int taille,char *prenom){
 	/** donne le nom du pere de l'Individu */
+	int i;
+	for(i=0;i<taille;i++){
+		if(mystrcmp(l[i]->prenom,prenom)==0){
+			if(l[i]->pere != NULL){
+				printf("%s\n",l[i]->pere->prenom);
+			}
+			else{
+				printf("pere inconnu\n");
+			}
+		}
+	}
 	return;
 }
 
-void mere(char *prenom){
+void mere(Individu **l, int taille,char *prenom){
 	/** donne le nom de la mere de l'Individu prenom */
+	int i;
+	for(i=0;i<taille;i++){
+		if(mystrcmp(l[i]->prenom,prenom)==0){
+			if(l[i]->mere != NULL){
+				printf("%s\n",l[i]->mere->prenom);
+			}
+			else{
+				printf("mere inconnu\n");
+			}
+		}
+	}
 	return;
 } 
 
-void parents (char *prenom){
+void parents (Individu **l, int taille,char *prenom){
 	/** donne les noms des parents de l'Individu */
+	pere(l,taille,prenom);
+	mere(l,taille,prenom);
 	return;
 }
 
 ////////////////////
 
 
-void gd_peres(char *prenom){
+void gd_peres(Individu **l, int taille,char *prenom){
 	/** donne les nom des grand-peres de l'Individu */
+	int i;
+	for(i=0;i<taille;i++){
+		if(mystrcmp(l[i]->prenom,prenom)==0){
+			if(l[i]->pere != NULL){
+				if(l[i]->pere->pere != NULL){
+					printf("%s\n",l[i]->pere->pere->prenom);
+				}
+				else{
+					printf("grand pere paternel inconnu\n");
+				}
+			}
+		}
+	}
+	for(i=0;i<taille;i++){
+		if(mystrcmp(l[i]->prenom,prenom)==0){
+			if(l[i]->mere != NULL){
+				if(l[i]->mere->pere != NULL){
+					printf("%s\n",l[i]->mere->pere->prenom);
+				}
+				else{
+					printf("grand pere maternel inconnu\n");
+				}
+			}
+		}
+	}
 	return;
 }
 
-void gd_meres(char *prenom){
+void gd_meres(Individu **l, int taille, char *prenom){
 	/** donne les noms des grand-meres de l'Individu */
+	int i;
+	for(i=0;i<taille;i++){
+		if(mystrcmp(l[i]->prenom,prenom)==0){
+			if(l[i]->pere != NULL){
+				if(l[i]->pere->mere != NULL){
+					printf("%s\n",l[i]->pere->mere->prenom);
+				}
+				else{
+					printf("grand mere paternelle inconnu\n");
+				}
+			}
+		}
+	}
+	for(i=0;i<taille;i++){
+		if(mystrcmp(l[i]->prenom,prenom)==0){
+			if(l[i]->mere != NULL){
+				if(l[i]->mere->mere != NULL){
+					printf("%s\n",l[i]->mere->mere->prenom);
+				}
+				else{
+					printf("grand mere maternelle inconnu\n");
+				}
+			}
+		}
+	}
 	return;
 } 
 
-void gd_parents (char *prenom){
+void gd_parents (Individu **l, int taille, char *prenom){
 	/** donne les noms des grans-parents de l'Individu */
+	gd_peres(l,taille,prenom);
+	gd_meres(l,taille,prenom);
 	return;
 }
 
@@ -580,7 +671,7 @@ char **commande(char *cmd, int *new_nb_arg){
 	return fct;
 }
 
-void interface (List *indiv){
+void interface (List *indiv, Individu **listIndiv, int taille){
 	int i;
 	int *nb_arg = malloc(sizeof(int));
 	*nb_arg = 5;
@@ -589,9 +680,11 @@ void interface (List *indiv){
 	ma_cmd[0] = malloc(sizeof(char));
 	ma_cmd[0] = "";
 	while(mystrcmp(ma_cmd[0],"exit")!=0){
+		listIndiv = toutLesIndividus(indiv,&taille);
 		printf(">> ");
 		scanf("%s",cmd_u);
 		ma_cmd=commande(cmd_u,nb_arg);
+		
 		if(mystrcmp(ma_cmd[0], "view") == 0){
 			view(indiv);
 			viderBuffer();
@@ -612,6 +705,28 @@ void interface (List *indiv){
 			} else {
 				new(indiv, ma_cmd[1],ma_cmd[2][0],ma_cmd[3],ma_cmd[4]);
 			}
+		}else if (mystrcmp(ma_cmd[0],"info")==0){
+			info(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"mere")==0){
+			mere(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"pere")==0){
+			pere(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"parents")==0){
+			parents(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"gdperes")==0){
+			gd_peres(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();	
+		}else if (mystrcmp(ma_cmd[0],"gdmeres")==0){
+			gd_meres(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();	
+		}else if (mystrcmp(ma_cmd[0],"gdparents")==0){
+			gd_parents(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+			
 		} else {
 			if(mystrcmp(ma_cmd[0], "exit") != 0)
 				printf("Aucune option reconnue\n");
@@ -686,6 +801,9 @@ void interface (List *indiv){
 
 int main(void){
 	List *l = nouvelleListe();
+	Individu **in;
+	int taille;
+	
 	/*
 	new(l,"A",'m',NULL,NULL);
 	view(l);printf("\n");
@@ -725,7 +843,7 @@ int main(void){
 			printf("%s\n",ma_cmd[i]);
 	}*/
 	
-	interface(l);
+	interface(l,in,taille);
 	//save("test.txt",l);
 	//load("test.txt",l);
 	//view(l);
