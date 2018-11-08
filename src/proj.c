@@ -169,6 +169,7 @@ FILE* ouvrirFichier(char* nom, char* option){
 
 void fermerFichier(FILE* fichier){
 	fclose(fichier);
+	fichier=NULL;
 }
 
 //Fonction sujet
@@ -398,11 +399,11 @@ void load (char *nom_fichier, List *l){
 				}
 			}
 		}
-		/*for(i=0;i<4;i++){
+		fermerFichier(fichier);
+		for(i=0;i<4;i++){
 			free(indv[i]);
 		}
-		free(indv);*/
-		fermerFichier(fichier);
+		free(indv);
 	} else {
 		printf("Le fichier %s n'existe pas.\n",nom_fichier);
 	}
