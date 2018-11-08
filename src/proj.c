@@ -422,16 +422,16 @@ int existe(Individu **l, int taille, char *prenom){
 	return 0;
 }
 
-Individu *info(Individu **l, int taille, char *prenom){
+void info(Individu **l, int taille, char *prenom){
 	/** affiche prenom sexe pere mere de l'individu */
 	int i;
 	for(i=0;i<taille;i++){
 		if(mystrcmp(l[i]->prenom,prenom)==0){
 			afficherIndividu(l[i]);
+			return;
 		}
 	}
-	
-	return l[i];
+	printf("Individu inconnu\n");
 }
 
 void pere(Individu **l, int taille,char *prenom){
@@ -440,14 +440,12 @@ void pere(Individu **l, int taille,char *prenom){
 	for(i=0;i<taille;i++){
 		if(mystrcmp(l[i]->prenom,prenom)==0){
 			if(l[i]->pere != NULL){
-				printf("%s\n",l[i]->pere->prenom);
-			}
-			else{
-				printf("pere inconnu\n");
+				printf("Pere : %s\n",l[i]->pere->prenom);
+				return;
 			}
 		}
 	}
-	return;
+	printf("Pere inconnu\n");
 }
 
 void mere(Individu **l, int taille,char *prenom){
@@ -456,21 +454,18 @@ void mere(Individu **l, int taille,char *prenom){
 	for(i=0;i<taille;i++){
 		if(mystrcmp(l[i]->prenom,prenom)==0){
 			if(l[i]->mere != NULL){
-				printf("%s\n",l[i]->mere->prenom);
-			}
-			else{
-				printf("mere inconnu\n");
+				printf("Mere : %s\n",l[i]->mere->prenom);
+				return;
 			}
 		}
 	}
-	return;
+	printf("Mere inconnu\n");
 } 
 
 void parents (Individu **l, int taille,char *prenom){
 	/** donne les noms des parents de l'Individu */
 	pere(l,taille,prenom);
 	mere(l,taille,prenom);
-	return;
 }
 
 ////////////////////
@@ -483,7 +478,8 @@ void gd_peres(Individu **l, int taille,char *prenom){
 		if(mystrcmp(l[i]->prenom,prenom)==0){
 			if(l[i]->pere != NULL){
 				if(l[i]->pere->pere != NULL){
-					printf("%s\n",l[i]->pere->pere->prenom);
+					printf("Gd Pere paternel : %s\n",l[i]->pere->pere->prenom);
+					break;
 				}
 				else{
 					printf("grand pere paternel inconnu\n");
@@ -495,7 +491,8 @@ void gd_peres(Individu **l, int taille,char *prenom){
 		if(mystrcmp(l[i]->prenom,prenom)==0){
 			if(l[i]->mere != NULL){
 				if(l[i]->mere->pere != NULL){
-					printf("%s\n",l[i]->mere->pere->prenom);
+					printf("Gd Pere maternel : %s\n",l[i]->mere->pere->prenom);
+					return;
 				}
 				else{
 					printf("grand pere maternel inconnu\n");
@@ -503,7 +500,6 @@ void gd_peres(Individu **l, int taille,char *prenom){
 			}
 		}
 	}
-	return;
 }
 
 void gd_meres(Individu **l, int taille, char *prenom){
@@ -513,7 +509,8 @@ void gd_meres(Individu **l, int taille, char *prenom){
 		if(mystrcmp(l[i]->prenom,prenom)==0){
 			if(l[i]->pere != NULL){
 				if(l[i]->pere->mere != NULL){
-					printf("%s\n",l[i]->pere->mere->prenom);
+					printf("Gd Mere paternelle : %s\n",l[i]->pere->mere->prenom);
+					break;
 				}
 				else{
 					printf("grand mere paternelle inconnu\n");
@@ -525,7 +522,8 @@ void gd_meres(Individu **l, int taille, char *prenom){
 		if(mystrcmp(l[i]->prenom,prenom)==0){
 			if(l[i]->mere != NULL){
 				if(l[i]->mere->mere != NULL){
-					printf("%s\n",l[i]->mere->mere->prenom);
+					printf("Gd Mere maternelle : %s\n",l[i]->mere->mere->prenom);
+					return;
 				}
 				else{
 					printf("grand mere maternelle inconnu\n");
@@ -533,21 +531,18 @@ void gd_meres(Individu **l, int taille, char *prenom){
 			}
 		}
 	}
-	return;
 } 
 
 void gd_parents (Individu **l, int taille, char *prenom){
 	/** donne les noms des grans-parents de l'Individu */
 	gd_peres(l,taille,prenom);
 	gd_meres(l,taille,prenom);
-	return;
 }
 
 
 void ascendants (char *prenom){
 	/**donne les noms de tout les ascendant de l'individu 
 	 * (parents, gd-parents, arriere gd-parents etc) */
-	 return;
 }
 
 ////////////////////
@@ -555,17 +550,14 @@ void ascendants (char *prenom){
 
 void enfants (char *prenom){
 	/** donne les noms des enfants de l'individu */
-	return;
 }
 
 void petits_enfant (char *prenom){
 	/** donne les noms des petits enfants de l'individu */
-	return;
 }
 
 void descendants (char *prenom){
 	/** done les noms de tout les descendant de l'individu */
-	return;
 }
 
 ////////////////////
@@ -573,44 +565,36 @@ void descendants (char *prenom){
 void partenaires (char *prenom){
 	/**donne les noms de tout les partenaires de l'individu 
 	 * (-> partenaires si enfant en commun) */
-	 return;
 }
 
 ////////////////////
 
 void freres (char *prenom){
 	/** donne les noms de tout les freres de l'individu */
-	return;
 }
 
 void soeurs (char *prenom){
 	/** donne les noms de toutes les soeurs de l'individu */
-	return;
 }
 
 void demi_freres (char *prenom){
 	/** donne les noms de tout les demi-freres de l'individu */
-	return;
 }
 
 void demi_soeurs (char *prenom){
 	/** donne les noms de toutes les demi-soeurs de l'individu */
-	return;
 }
 
 void oncles (char *prenom){
 	/** donne les noms de tout les oncles de l'individu */
-	return;
 }
 
 void tantes (char *prenom){
 	/** donne les noms de toutes les tantes de l'individu */
-	return;
 }
 
 void cousins (char *prenom){
 	/** donne les nom des tout les cousins de l'individu */
-	return;
 }
 
 ////////////////////////////////////////////////////////////////////////
