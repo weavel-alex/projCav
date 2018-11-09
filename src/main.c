@@ -435,53 +435,76 @@ void gd_parents (Individu **l, int taille, char *prenom){
 	gd_meres(l,taille,prenom);
 }
 
-void ascendants (char *prenom){
+void ascendants (Individu **l, int taille,char *prenom){
 	/**donne les noms de tout les ascendant de l'individu 
 	 * (parents, gd-parents, arriere gd-parents etc) */
-}
+	 int i;
+	 for(i=0;i<taille;i++){
+		 if (mystrcmp(l[i]->prenom,prenom) == 0){
+			 if (l[i]->pere != NULL){
+				printf("%s \n",l[i]->pere->prenom);
+				ascendants(l,taille,l[i]->pere->prenom);
+			 }
+			 if(l[i]->mere != NULL){
+				 printf("%s \n",l[i]->mere->prenom);
+				 ascendants(l,taille,l[i]->mere->prenom);
+			 }
+		 }
+	 }
+ }
 
-void enfants (char *prenom){
+void enfants (Individu **l, int taille,char *prenom){
 	/** donne les noms des enfants de l'individu */
+	int i;
+	for(i=0;i<taille;i++){
+		if (l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,prenom)==0){
+			printf("%s \n",l[i]->prenom);
+		}
+		if (l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,prenom)==0){
+			printf("%s \n",l[i]->prenom);
+		}
+	}
 }
 
-void petits_enfant (char *prenom){
+void petits_enfant (Individu **l, int taille,char *prenom){
 	/** donne les noms des petits enfants de l'individu */
 }
 
-void descendants (char *prenom){
+void descendants (Individu **l, int taille,char *prenom){
 	/** done les noms de tout les descendant de l'individu */
+		
 }
 
-void partenaires (char *prenom){
+void partenaires (Individu **l, int taille,char *prenom){
 	/**donne les noms de tout les partenaires de l'individu 
 	 * (-> partenaires si enfant en commun) */
 }
 
-void freres (char *prenom){
+void freres (Individu **l, int taille,char *prenom){
 	/** donne les noms de tout les freres de l'individu */
 }
 
-void soeurs (char *prenom){
+void soeurs (Individu **l, int taille,char *prenom){
 	/** donne les noms de toutes les soeurs de l'individu */
 }
 
-void demi_freres (char *prenom){
+void demi_freres (Individu **l, int taille,char *prenom){
 	/** donne les noms de tout les demi-freres de l'individu */
 }
 
-void demi_soeurs (char *prenom){
+void demi_soeurs (Individu **l, int taille,char *prenom){
 	/** donne les noms de toutes les demi-soeurs de l'individu */
 }
 
-void oncles (char *prenom){
+void oncles (Individu **l, int taille,char *prenom){
 	/** donne les noms de tout les oncles de l'individu */
 }
 
-void tantes (char *prenom){
+void tantes (Individu **l, int taille,char *prenom){
 	/** donne les noms de toutes les tantes de l'individu */
 }
 
-void cousins (char *prenom){
+void cousins (Individu **l, int taille,char *prenom){
 	/** donne les nom des tout les cousins de l'individu */
 }
 
@@ -600,6 +623,12 @@ void interface (List *indiv, Individu **listIndiv, int taille){
 			viderBuffer();	
 		}else if (mystrcmp(ma_cmd[0],"gdparents")==0){
 			gd_parents(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"ascendants")==0){
+			ascendants(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"enfants")==0){
+			enfants(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
 			
 		} else {
