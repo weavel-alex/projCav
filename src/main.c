@@ -70,6 +70,10 @@ void MAJToutLesIndividus(List *l, Individu ***tab, int *taille){
 	*(tab) = toutLesIndividus(l,taille);
 }
 
+void mofif(){
+	//A FAIRE SI PAS LA FLEMME
+}
+
 int existe(Individu **l, int taille, char *prenom){
 	for(int i=0;i<taille;i++){
 		if(mystrcmp(l[i]->prenom,prenom)==0){
@@ -98,7 +102,7 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 	} else {
 		//Ajout en fin de chaine si pas de parents
 		//Verifie que le pere car s'il n'a pas de pere il n'aura pas de mere
-		if(prenom_pere == NULL){
+		if(prenom_pere == NULL && prenom_mere == NULL){
 			ListNode *actuel = l->premier;
 			while(actuel->next != NULL){
 				actuel = actuel->next;
@@ -268,7 +272,7 @@ void load (char *nom_fichier, List *l){
 		}
 		for(c = fgetc(fichier); !feof(fichier); c = fgetc(fichier)){
 			//Creation du mot
-			if(estLettre(c)){
+			if(estLettre(c) || c == '-'){
 				indv[ptr][fin_mot] = c;
 				fin_mot++;
 				if(fin_mot+1 == taille_mot){
@@ -575,7 +579,6 @@ void interface (List *indiv, Individu **listIndiv, int taille){
 	ma_cmd[0] = malloc(sizeof(char));
 	ma_cmd[0] = "";
 	while(mystrcmp(ma_cmd[0],"exit")!=0){
-		//listIndiv = toutLesIndividus(indiv,&taille);
 		printf(">> ");
 		scanf("%s",cmd_u);
 		ma_cmd=commande(cmd_u,nb_arg);
@@ -587,7 +590,7 @@ void interface (List *indiv, Individu **listIndiv, int taille){
 			printf("Fin de l'application\n");
 			viderBuffer();
 		} else if((*nb_arg) <= 1){
-			printf("Commande invalide\n");
+			printf("Commande invalide, problemes dans les parametres.\n");
 			viderBuffer();
 		} else if(mystrcmp(ma_cmd[0], "load") == 0){
 			viderListe(&indiv);
@@ -597,11 +600,23 @@ void interface (List *indiv, Individu **listIndiv, int taille){
 		} else if(mystrcmp(ma_cmd[0], "save") == 0){
 			save(ma_cmd[1],indiv);
 		} else if(mystrcmp(ma_cmd[0], "new" ) == 0){
-			if((*nb_arg) < 3 || (*nb_arg) == 4){
+			if((*nb_arg) < 3){
 				printf("Commande non valide, probleme de parametre\n");
 			} else {
-				new(indiv, ma_cmd[1],ma_cmd[2][0],ma_cmd[3],ma_cmd[4],listIndiv,taille);
-				MAJToutLesIndividus(indiv,&listIndiv,&taille);
+				if(ma_cmd[3] != NULL && !existe(listIndiv,taille,ma_cmd[3])){
+					new(indiv,ma_cmd[3],'m',NULL,NULL,listIndiv,taille);
+					MAJToutLesIndividus(indiv,&listIndiv,&taille);
+				}
+				if(ma_cmd[4] != NULL && !existe(listIndiv,taille,ma_cmd[4])){
+					new(indiv,ma_cmd[4],'f',NULL,NULL,listIndiv,taille);
+					MAJToutLesIndividus(indiv,&listIndiv,&taille);
+				}
+				if(!existe(listIndiv,taille,ma_cmd[1])){
+					new(indiv, ma_cmd[1],ma_cmd[2][0],ma_cmd[3],ma_cmd[4],listIndiv,taille);
+					MAJToutLesIndividus(indiv,&listIndiv,&taille);
+				} else {
+					printf("Existe deja\n");
+				}
 			}
 		}else if (mystrcmp(ma_cmd[0],"info")==0){
 			info(listIndiv,taille,ma_cmd[1]);
