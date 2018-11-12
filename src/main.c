@@ -89,6 +89,7 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 		printf("new : Sexe ne correspond pas\n");
 		return;
 	}
+	//Si la liste est vide
 	if(l->premier == NULL){
 		ListNode *node = malloc(sizeof(*node));
 		Individu *ind = initialisationIndividu();
@@ -101,7 +102,6 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 		l->premier = node;
 	} else {
 		//Ajout en fin de chaine si pas de parents
-		//Verifie que le pere car s'il n'a pas de pere il n'aura pas de mere
 		if(prenom_pere == NULL && prenom_mere == NULL){
 			ListNode *actuel = l->premier;
 			while(actuel->next != NULL){
@@ -124,59 +124,64 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 			Individu *mama = NULL;
 			ListNode *actuel = l->premier;
 			ListNode *prec = actuel;
-			//Verif dans la liste chainée
+			//Verif dans la liste chainée si les parents existe
 			while(actuel != NULL){
 				estModifiee = 0;
-				if(mystrcmp(actuel->individu->prenom,prenom_pere) == 0){
-					if(actuel->individu->sexe != 'm' && !erreur){
-						printf("new : Erreur de sexe pour le pere\n");
-						printf("new : Ajout annulé\n");
-						erreur = 1;
-					}
-					if(!erreur){
-						papa = actuel->individu;
-						if(prec == actuel){
-							//Si on doit enlever le tete
-							if(l->premier->next == NULL){
-								//Si un seul element dans la liste chainée, pour ne pas perdre le liste chainee
-								estSeul = 1;
+				if(prenom_pere != NULL){
+					if(mystrcmp(actuel->individu->prenom,prenom_pere) == 0){
+						if(actuel->individu->sexe != 'm' && !erreur){
+							printf("new : Erreur de sexe pour le pere\n");
+							printf("new : Ajout annulé\n");
+							erreur = 1;
+						}
+						if(!erreur){
+							papa = actuel->individu;
+							if(prec == actuel){
+								//Si on doit enlever le tete
+								if(l->premier->next == NULL){
+									//Si un seul element dans la liste chainée, pour ne pas perdre le liste chainee
+									estSeul = 1;
+								} else {
+									//Si pls noeud on remplace la tete
+									l->premier = l->premier->next;
+									actuel = l->premier;
+									prec = actuel;
+								}
 							} else {
-								//Si pls noeud on remplace la tete
-								l->premier = l->premier->next;
-								actuel = l->premier;
-								prec = actuel;
+								//On enleve normalement le noeud
+								prec->next = actuel->next;
+								actuel = prec;
 							}
-						} else {
-							//On enleve normalement le noeud
-							prec->next = actuel->next;
-							actuel = prec;
 						}
 					}
 				}
-				if(mystrcmp(actuel->individu->prenom,prenom_mere) == 0){
-					if(actuel->individu->sexe != 'f' && !erreur){
-						printf("new : Erreur de sexe pour la mere\n");
-						printf("new : Ajout annulé\n");
-						erreur = 1;
-					}
-					if(!erreur){
-						mama = actuel->individu;
-						if(prec == actuel){
-							if(l->premier->next == NULL){
-								estSeul = 1;
+				if(prenom_mere != NULL){
+					if(mystrcmp(actuel->individu->prenom,prenom_mere) == 0){
+						if(actuel->individu->sexe != 'f' && !erreur){
+							printf("new : Erreur de sexe pour la mere\n");
+							printf("new : Ajout annulé\n");
+							erreur = 1;
+						}
+						if(!erreur){
+							mama = actuel->individu;
+							if(prec == actuel){
+								if(l->premier->next == NULL){
+									estSeul = 1;
+								} else {
+									l->premier = l->premier->next;
+									actuel = l->premier;
+									prec = actuel;
+									estModifiee = 1;
+								}
 							} else {
-								l->premier = l->premier->next;
-								actuel = l->premier;
-								prec = actuel;
+								prec->next = actuel->next;
+								actuel = prec;
 								estModifiee = 1;
 							}
-						} else {
-							prec->next = actuel->next;
-							actuel = prec;
-							estModifiee = 1;
 						}
 					}
 				}
+				//Verifie si la modification concerne la mere dans ce cas on ne passe pas au suivant car on l'a deja fais
 				if(!estModifiee){
 					prec = actuel;
 					actuel = actuel->next;
@@ -189,27 +194,19 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 			//Si le parent rechercher n'est pas dans la liste chainée racine
 			//On parcours les parents pour le trouver
 			if(papa == NULL || mama == NULL){
-				//int *nbInd = malloc(sizeof(int));
-				//Individu **tab = toutLesIndividus(l,nbInd);
 				int i;
 				for(i=0;i<nbInd;i++){
-					if(papa == NULL){
+					if(papa == NULL && prenom_pere != NULL){
 						if(mystrcmp(prenom_pere,tab[i]->prenom) == 0){
 							papa = tab[i];
 						}
 					}
-					if(mama == NULL){
+					if(mama == NULL && prenom_mere != NULL){
 						if(mystrcmp(prenom_mere,tab[i]->prenom) == 0){
 							mama = tab[i];
 						}
 					}
 				}
-			}
-			if(papa == NULL){
-				printf("new : Aucun individu trouvé pour %s\n",prenom_pere);
-			}
-			if(mama == NULL){
-				printf("new : Aucun individu trouvé pour %s\n",prenom_mere);
 			}
 			//On ajoute notre nouveau noeud a liste
 			ListNode *node = malloc(sizeof(*node));
@@ -217,9 +214,18 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 			ind->prenom = malloc(sizeof(char)*strlen(prenom));
 			strcpy(ind->prenom,prenom);
 			ind->sexe = sexe;
-			ind->pere = papa;
-			ind->mere = mama;
-			
+			if(papa == NULL && prenom_pere != NULL){
+				printf("new : Aucun individu trouvé pour %s\n",prenom_pere);
+				ind->pere = NULL;
+			} else {
+				ind->pere = papa;
+			}
+			if(mama == NULL && prenom_mere != NULL){
+				printf("new : Aucun individu trouvé pour %s\n",prenom_mere);
+				ind->mere = NULL;
+			} else {
+				ind->mere = mama;
+			}
 			node->individu = ind;
 			
 			node->next = actuel;
@@ -246,10 +252,16 @@ void save (char *nom_fichier,List *l){
 		Individu **tab = toutLesIndividus(l, taille);
 		int i;
 		for(i=(*taille)-1;i>=0;i--){
-			if(tab[i]->pere != NULL){
+			if(tab[i]->pere != NULL && tab[i]->mere != NULL){
 				fprintf(fichier,"%s:%c,%s,%s\n",tab[i]->prenom,tab[i]->sexe,tab[i]->pere->prenom,tab[i]->mere->prenom);
 			} else {
-				fprintf(fichier,"%s:%c,,\n",tab[i]->prenom,tab[i]->sexe);
+				if(tab[i]->pere == NULL && tab[i]->mere != NULL){
+					fprintf(fichier,"%s:%c,,%s\n",tab[i]->prenom,tab[i]->sexe,tab[i]->mere->prenom);
+				} else if(tab[i]->pere != NULL && tab[i]->mere == NULL){
+					fprintf(fichier,"%s:%c,%s,\n",tab[i]->prenom,tab[i]->sexe,tab[i]->pere->prenom);
+				} else {
+					fprintf(fichier,"%s:%c,,\n",tab[i]->prenom,tab[i]->sexe);
+				}
 			}
 		}
 		fermerFichier(fichier);
@@ -271,7 +283,7 @@ void load (char *nom_fichier, List *l){
 			indv[i] = (char *)malloc(sizeof(char)*taille_mot);
 		}
 		for(c = fgetc(fichier); !feof(fichier); c = fgetc(fichier)){
-			//Creation du mot
+			//Creation du mot -> si une lettre ou un nom compose avec '-' par exemple j-c
 			if(estLettre(c) || c == '-'){
 				indv[ptr][fin_mot] = c;
 				fin_mot++;
@@ -532,29 +544,48 @@ char **commande(char *cmd, int *new_nb_arg){
 	}
 	for(i=0;i<strlen(cmd);i++){
 		if(cmd[i] != ' '){
+			if(estLettre(cmd[i]) || (j != 0 && cmd[i] == '-')){
+				fct[nb_arg][j] = cmd[i];
+				j++;
+				if(j == taille_mot){
+					taille_mot *= 2;
+					fct[nb_arg] = (char *)realloc(fct[nb_arg],sizeof(char)*taille_mot);
+				}
+			}
 			if(cmd[i] == '(' || cmd[i] == ','){
-				i++;
-				fct[nb_arg][j] = '\0';
-				if(j+1 < taille_mot){
-					fct[nb_arg] = (char *)realloc(fct[nb_arg],sizeof(char)*j);
+				//Si on met null en arg
+				if(mystrcmp(fct[nb_arg],"null") == 0){
+					fct[nb_arg] = NULL;
+				}
+				else if(j != 0){
+					//Si on a au moins une lettre
+					fct[nb_arg][j] = '\0';
+					if(j < taille_mot){
+						fct[nb_arg] = (char *)realloc(fct[nb_arg],sizeof(char)*j);
+					}
+				} else {
+					//Si vide ex: new(a,f,,m) -> arg pere = NULL du coup
+					fct[nb_arg] = NULL;
 				}
 				nb_arg++;j=0;
 			}
 			if(cmd[i] == ')'){
-				fct[nb_arg][j] = '\0';
-				if(j+1 < taille_mot){
-					fct[nb_arg] = (char *)realloc(fct[nb_arg],sizeof(char)*j);
+				if(mystrcmp(fct[nb_arg],"null") == 0){
+					fct[nb_arg] = NULL;
+				}
+				else if(j != 0){
+					fct[nb_arg][j] = '\0';
+					if(j < taille_mot){
+						fct[nb_arg] = (char *)realloc(fct[nb_arg],sizeof(char)*j);
+					}
+				} else {
+					fct[nb_arg] = NULL;
 				}
 				break;
 			}
-			fct[nb_arg][j] = cmd[i];
-			j++;
-			if(j+1 == taille_mot){
-				taille_mot *= 2;
-				fct[nb_arg] = (char *)realloc(fct[nb_arg],sizeof(char)*taille_mot);
-			}
 		}
 	}
+	//Dans le cas ou on rentre juste le nom pour les fct sans para comme view et exit
 	if(nb_arg == 0){
 		fct[nb_arg][j] = '\0';
 		if(j+1 < taille_mot){
@@ -599,23 +630,31 @@ void interface (List *indiv, Individu **listIndiv, int taille){
 			MAJToutLesIndividus(indiv,&listIndiv,&taille);
 		} else if(mystrcmp(ma_cmd[0], "save") == 0){
 			save(ma_cmd[1],indiv);
+		} else if(ma_cmd[1] == NULL){
+			printf("Prenom non valide\n");
+			viderBuffer();
 		} else if(mystrcmp(ma_cmd[0], "new" ) == 0){
 			if((*nb_arg) < 3){
 				printf("Commande non valide, probleme de parametre\n");
+				viderBuffer();
 			} else {
 				if(ma_cmd[3] != NULL && !existe(listIndiv,taille,ma_cmd[3])){
+					//Si le pere n'existe pas encore
 					new(indiv,ma_cmd[3],'m',NULL,NULL,listIndiv,taille);
 					MAJToutLesIndividus(indiv,&listIndiv,&taille);
 				}
 				if(ma_cmd[4] != NULL && !existe(listIndiv,taille,ma_cmd[4])){
+					//Si la mere n'existe pas encore
 					new(indiv,ma_cmd[4],'f',NULL,NULL,listIndiv,taille);
 					MAJToutLesIndividus(indiv,&listIndiv,&taille);
 				}
 				if(!existe(listIndiv,taille,ma_cmd[1])){
+					//Si l'individu n'existe pas
 					new(indiv, ma_cmd[1],ma_cmd[2][0],ma_cmd[3],ma_cmd[4],listIndiv,taille);
 					MAJToutLesIndividus(indiv,&listIndiv,&taille);
 				} else {
-					printf("Existe deja\n");
+					printf("Individu deja existant.\n");
+					viderBuffer();
 				}
 			}
 		}else if (mystrcmp(ma_cmd[0],"info")==0){
