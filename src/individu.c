@@ -9,6 +9,7 @@ Individu *initialisationIndividu(){
 	return indiv;
 }
 
+
 Individu *copieIndividu(Individu *ind){
 	Individu *copie = initialisationIndividu();
 	copie->prenom = malloc(sizeof(char)*strlen(ind->prenom));
@@ -19,10 +20,12 @@ Individu *copieIndividu(Individu *ind){
 	return copie;
 }
 
+/*
 Individu *copieIndividu(Individu *ind){
     Individu *copie = ind;
     return copie;
 }
+*/
 
 void afficherIndividu(Individu *ind){
 	if(ind == NULL){
