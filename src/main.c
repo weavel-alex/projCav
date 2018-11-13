@@ -385,6 +385,9 @@ void gd_peres(Individu **l, int taille,char *prenom){
 					printf("grand pere paternel inconnu\n");
 				}
 			}
+			else{
+				printf("pere inconnu\n");
+			}
 		}
 	}
 	for(i=0;i<taille;i++){
@@ -397,6 +400,9 @@ void gd_peres(Individu **l, int taille,char *prenom){
 				else{
 					printf("grand pere maternel inconnu\n");
 				}
+			}
+			else{
+				printf("mere inconnue\n");
 			}
 		}
 	}
@@ -472,40 +478,223 @@ void enfants (Individu **l, int taille,char *prenom){
 
 void petits_enfant (Individu **l, int taille,char *prenom){
 	/** donne les noms des petits enfants de l'individu */
+	int i,j;
+	
+	for(i=0;i<taille;i++){
+		if (l[i]->pere != NULL){
+			if(l[i]->pere->pere != NULL && mystrcmp(prenom,l[i]->pere->pere->prenom)==0){
+				printf("%s \n",l[i]->prenom);
+			}
+			if(l[i]->pere->mere != NULL && mystrcmp(prenom,l[i]->pere->mere->prenom)==0){
+				printf("%s \n",l[i]->prenom);
+			}
+		}
+		if (l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,prenom)==0){
+			if(l[i]->mere->pere != NULL && mystrcmp(prenom,l[i]->mere->pere->prenom)==0){
+				printf("%s \n",l[i]->prenom);
+			}
+			if(l[i]->mere->mere != NULL && mystrcmp(prenom,l[i]->mere->mere->prenom)==0){
+				printf("%s \n",l[i]->prenom);
+			}
+		}
+	}
 }
 
 void descendants (Individu **l, int taille,char *prenom){
 	/** done les noms de tout les descendant de l'individu */
-		
+	int i;
+	for(i=0;i<taille;i++){
+		if (l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,prenom)==0){
+			printf("%s \n",l[i]->prenom);
+			descendants(l,taille,l[i]->prenom);
+		}
+		if (l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,prenom)==0){
+			printf("%s \n",l[i]->prenom);
+			descendants(l,taille,l[i]->prenom);
+		}
+	}
 }
+		
 
 void partenaires (Individu **l, int taille,char *prenom){
 	/**donne les noms de tout les partenaires de l'individu 
 	 * (-> partenaires si enfant en commun) */
+	 int i;
+	 char s;
+	
+	for(i=0;i<taille;i++){
+		if (mystrcmp(l[i]->prenom,prenom)==0){
+			s=l[i]->sexe;
+		}
+	}
+	
+	if (s == 'm'){
+		for(i=0;i<taille;i++){
+			if (l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,prenom)==0){
+				if (l[i]->mere != NULL){
+					printf("%s \n",l[i]->mere->prenom);
+				}
+				else{printf("une partenaire inconnue\n");}
+			}
+		}
+	}
+	
+	if (s == 'f'){
+		for(i=0;i<taille;i++){
+			if (l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,prenom)==0){
+				if (l[i]->pere != NULL){
+					printf("%s \n",l[i]->pere->prenom);
+				}
+				else{printf("un partenaire inconnue\n");}
+			}
+		}
+	}
 }
 
 void freres (Individu **l, int taille,char *prenom){
 	/** donne les noms de tout les freres de l'individu */
+	int i=0;
+	Individu *cur;
+	for(i=0;i<taille;i++){
+		if (mystrcmp(prenom,l[i]->prenom)==0){
+			cur=l[i];
+		}
+	}
+	for(i=0;i<taille;i++){
+		if (l[i]->sexe == 'm' && mystrcmp(l[i]->prenom,cur->prenom)!=0){
+			if (cur->pere != NULL){
+				if(l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)==0){
+					if (cur->mere != NULL && l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)==0){
+						printf("%s \n",l[i]->prenom);
+					}
+				}
+			}	
+		}
+	}
 }
 
 void soeurs (Individu **l, int taille,char *prenom){
 	/** donne les noms de toutes les soeurs de l'individu */
+	int i=0;
+	Individu *cur;
+	for(i=0;i<taille;i++){
+		if (mystrcmp(prenom,l[i]->prenom)==0){
+			cur=l[i];
+		}
+	}
+	for(i=0;i<taille;i++){
+		if (l[i]->sexe == 'f' && mystrcmp(l[i]->prenom,cur->prenom)!=0){
+			if (cur->pere != NULL){
+				if(l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)==0){
+					if (cur->mere != NULL && l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)==0){
+						printf("%s \n",l[i]->prenom);
+					}
+				}
+			}	
+		}
+	}
 }
 
 void demi_freres (Individu **l, int taille,char *prenom){
 	/** donne les noms de tout les demi-freres de l'individu */
+	int i=0;
+	Individu *cur;
+	for(i=0;i<taille;i++){
+		if (mystrcmp(prenom,l[i]->prenom)==0){
+			cur=l[i];
+		}
+	}
+	for(i=0;i<taille;i++){
+		if (l[i]->sexe == 'm' && mystrcmp(l[i]->prenom,cur->prenom)!=0){
+			if (cur->pere != NULL){
+				if(l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)==0){
+					if (cur->mere != NULL && l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)!=0){
+						printf("%s \n",l[i]->prenom);
+					}
+				}
+			}	
+			if (cur->pere != NULL){
+				if(l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)!=0){
+					if (cur->mere != NULL && l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)==0){
+						printf("%s \n",l[i]->prenom);
+					}
+				}
+			}	
+		}
+	}
 }
 
 void demi_soeurs (Individu **l, int taille,char *prenom){
 	/** donne les noms de toutes les demi-soeurs de l'individu */
+	int i=0;
+	Individu *cur;
+	for(i=0;i<taille;i++){
+		if (mystrcmp(prenom,l[i]->prenom)==0){
+			cur=l[i];
+		}
+	}
+	for(i=0;i<taille;i++){
+		if (l[i]->sexe == 'f' && mystrcmp(l[i]->prenom,cur->prenom)!=0){
+			if (cur->pere != NULL){
+				if(l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)==0){
+					if (cur->mere != NULL && l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)!=0){
+						printf("%s \n",l[i]->prenom);
+					}
+				}
+			}	
+			if (cur->pere != NULL){
+				if(l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)!=0){
+					if (cur->mere != NULL && l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)==0){
+						printf("%s \n",l[i]->prenom);
+					}
+				}
+			}	
+		}
+	}
 }
 
 void oncles (Individu **l, int taille,char *prenom){
 	/** donne les noms de tout les oncles de l'individu */
+	int i=0;
+	Individu *cur;
+	for(i=0;i<taille;i++){
+		if (mystrcmp(prenom,l[i]->prenom)==0){
+			if(l[i]->pere != NULL){
+				freres(l,taille,l[i]->pere->prenom);
+			}
+			else{
+				printf("pere inconnu");
+			}
+			if(l[i]->mere != NULL){
+				freres(l,taille,l[i]->mere->prenom);
+			}
+			else{
+				printf("mere inconnue");
+			}
+		}
+	}
 }
 
 void tantes (Individu **l, int taille,char *prenom){
 	/** donne les noms de toutes les tantes de l'individu */
+		int i=0;
+	Individu *cur;
+	for(i=0;i<taille;i++){
+		if (mystrcmp(prenom,l[i]->prenom)==0){
+			if(l[i]->pere != NULL){
+				soeurs(l,taille,l[i]->pere->prenom);
+			}
+			else{
+				printf("pere inconnu");
+			}
+			if(l[i]->mere != NULL){
+				soeurs(l,taille,l[i]->mere->prenom);
+			}
+			else{
+				printf("mere inconnue");
+			}
+		}
+	}
 }
 
 void cousins (Individu **l, int taille,char *prenom){
@@ -644,6 +833,33 @@ void interface (List *indiv, Individu **listIndiv, int taille){
 			viderBuffer();
 		}else if (mystrcmp(ma_cmd[0],"enfants")==0){
 			enfants(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"petit_enfants")==0){
+			petits_enfant(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"descendants")==0){
+			descendants(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"partenaires")==0){
+			partenaires(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"freres")==0){
+			freres(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"soeurs")==0){
+			soeurs(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"oncles")==0){
+			oncles(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"tantes")==0){
+			tantes(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"demi_soeurs")==0){
+			demi_soeurs(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+		}else if (mystrcmp(ma_cmd[0],"demi_freres")==0){
+			demi_freres(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
 			
 		} else {
