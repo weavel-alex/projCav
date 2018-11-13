@@ -1,5 +1,14 @@
 #include "main.h"
 
+void modificationPrenom(char *prenom, char new_prenom, Individu **l, int taille){
+    for(int i=0;i<taille;i++){
+        if(mystrcmp(l[i]->prenom,prenom)==0){
+            l[i]->prenom = realloc(l[i]->prenom,sizeof(char)strlen(new_prenom));
+            strcpy(l[i]->prenom,new_prenom);
+        }
+    }
+}
+
 Individu **toutLesIndividus (List *l, int *taille){
 	/** stocke l'arbre en memoire */
 	int taille_max = 20;

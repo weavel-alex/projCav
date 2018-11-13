@@ -19,6 +19,11 @@ Individu *copieIndividu(Individu *ind){
 	return copie;
 }
 
+Individu *copieIndividu(Individu *ind){
+    Individu *copie = ind;
+    return copie;
+}
+
 void afficherIndividu(Individu *ind){
 	if(ind == NULL){
 		printf("NULL\n");

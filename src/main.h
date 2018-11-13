@@ -7,6 +7,13 @@
 Individu **toutLesIndividus(List *l, int *taille);
 void MAJToutLesIndividus(List *l, Individu ***tab, int *taille);
 
+//Tableau de tout les individus
+Individu toutLesIndividus(List *l, int *taille);
+void MAJToutLesIndividus(List *l, Individu *tab, int *taille);
+
+//Modification du prenom d'un individu
+void modificationPrenom(char *prenom, char *new_prenom, Individu **l, int taille);
+
 //Vérification
 int existe(Individu **l, int taille, char *prenom);
 
