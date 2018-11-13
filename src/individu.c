@@ -20,12 +20,19 @@ Individu *copieIndividu(Individu *ind){
 }
 
 void afficherIndividu(Individu *ind){
-	if(ind->prenom != NULL){
+	if(ind == NULL){
+		printf("NULL\n");
+	} else if(ind->prenom != NULL){
 		printf("%s:%c,",ind->prenom,ind->sexe);
 		if(ind->pere == NULL){
-			printf(",\n");
+			printf(",");
 		} else {
-			printf("%s,%s\n",ind->pere->prenom,ind->mere->prenom);
+			printf("%s,",ind->pere->prenom);
+		}
+		if(ind->mere == NULL){
+			printf("\n");
+		} else {
+			printf("%s\n",ind->mere->prenom);
 		}
 	}
 }
