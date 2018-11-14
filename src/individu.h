@@ -15,4 +15,10 @@ Individu *initialisationIndividu();
 Individu *copieIndividu(Individu *ind);
 void afficherIndividu(Individu *ind);
 
+//Vérification
+int existe(Individu **l, int taille, char *prenom);
+
+//Modification du prenom d'un individu
+void modificationPrenom(char *prenom, char *new_prenom, Individu **l, int taille);
+
 #endif
