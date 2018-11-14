@@ -503,6 +503,11 @@ void interface (List *indiv, Individu **listIndiv, int taille){
 			demi_freres(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
 			
+		}else if (mystrcmp(ma_cmd[0],"cousins")==0){
+			cousins(listIndiv,taille,ma_cmd[1]);
+			viderBuffer();
+			
+			
 		} else {
 			if(mystrcmp(ma_cmd[0], "exit") != 0)
 				printf("Aucune option reconnue\n");

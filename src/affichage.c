@@ -134,11 +134,11 @@ void ascendants (Individu **l, int taille,char *prenom){
 	 for(i=0;i<taille;i++){
 		 if (mystrcmp(l[i]->prenom,prenom) == 0){
 			 if (l[i]->pere != NULL){
-				printf("%s\n",l[i]->pere->prenom);
+				printf("\t%s\n",l[i]->pere->prenom);
 				ascendants(l,taille,l[i]->pere->prenom);
 			 }
 			 if(l[i]->mere != NULL){
-				 printf("%s\n",l[i]->mere->prenom);
+				 printf("\t%s\n",l[i]->mere->prenom);
 				 ascendants(l,taille,l[i]->mere->prenom);
 			 }
 		 }
@@ -151,16 +151,18 @@ void enfants (Individu **l, int taille,char *prenom){
 	int aP=0;
 	for(i=0;i<taille;i++){
 		if (l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,prenom)==0){
-			printf("Pere : %s\n",l[i]->prenom);
+			printf("\t%s\n",l[i]->prenom);
 			aP=1;
 		}
 		if (l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,prenom)==0){
-			printf("Mere : %s\n",l[i]->prenom);
+			printf("\t%s\n",l[i]->prenom);
 			aP=1;
 		}
 	}
+	/*
 	if(!aP)
-		printf("Aucun enfant\n");
+		printf("%s: Aucun enfant\n",prenom);
+	*/
 }
 
 void petits_enfant (Individu **l, int taille,char *prenom){
@@ -170,21 +172,21 @@ void petits_enfant (Individu **l, int taille,char *prenom){
 	for(i=0;i<taille;i++){
 		if (l[i]->pere != NULL){
 			if(l[i]->pere->pere != NULL && mystrcmp(prenom,l[i]->pere->pere->prenom)==0){
-				printf("%s\n",l[i]->prenom);
+				printf("\t%s\n",l[i]->prenom);
 				aP=1;
 			}
 			if(l[i]->pere->mere != NULL && mystrcmp(prenom,l[i]->pere->mere->prenom)==0){
-				printf("%s\n",l[i]->prenom);
+				printf("\t%s\n",l[i]->prenom);
 				aP=1;
 			}
 		}
 		if (l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,prenom)==0){
 			if(l[i]->mere->pere != NULL && mystrcmp(prenom,l[i]->mere->pere->prenom)==0){
-				printf("%s\n",l[i]->prenom);
+				printf("\t%s\n",l[i]->prenom);
 				aP=1;
 			}
 			if(l[i]->mere->mere != NULL && mystrcmp(prenom,l[i]->mere->mere->prenom)==0){
-				printf("%s\n",l[i]->prenom);
+				printf("\t%s\n",l[i]->prenom);
 				aP=1;
 			}
 		}
@@ -198,11 +200,11 @@ void descendants (Individu **l, int taille,char *prenom){
 	int i;
 	for(i=0;i<taille;i++){
 		if (l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,prenom)==0){
-			printf("%s\n",l[i]->prenom);
+			printf("\t%s\n",l[i]->prenom);
 			descendants(l,taille,l[i]->prenom);
 		}
 		if (l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,prenom)==0){
-			printf("%s\n",l[i]->prenom);
+			printf("\t%s\n",l[i]->prenom);
 			descendants(l,taille,l[i]->prenom);
 		}
 	}
@@ -224,7 +226,7 @@ void partenaires (Individu **l, int taille,char *prenom){
 		for(i=0;i<taille;i++){
 			if (l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,prenom)==0){
 				if (l[i]->mere != NULL){
-					printf("%s\n",l[i]->mere->prenom);
+					printf("\t%s\n",l[i]->mere->prenom);
 				} else {
 					printf("Partenaire inconnue\n");
 				}
@@ -235,7 +237,7 @@ void partenaires (Individu **l, int taille,char *prenom){
 		for(i=0;i<taille;i++){
 			if (l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,prenom)==0){
 				if (l[i]->pere != NULL){
-					printf("%s\n",l[i]->pere->prenom);
+					printf("\t%s\n",l[i]->pere->prenom);
 				} else {
 					printf("Partenaire inconnu\n");
 				}
@@ -258,7 +260,7 @@ void freres (Individu **l, int taille,char *prenom){
 			if (cur->pere != NULL){
 				if(l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)==0){
 					if (cur->mere != NULL && l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)==0){
-						printf("%s\n",l[i]->prenom);
+						printf("\t%s\n",l[i]->prenom);
 					}
 				}
 			}	
@@ -280,7 +282,7 @@ void soeurs (Individu **l, int taille,char *prenom){
 			if (cur->pere != NULL){
 				if(l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)==0){
 					if (cur->mere != NULL && l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)==0){
-						printf("%s\n",l[i]->prenom);
+						printf("\t%s\n",l[i]->prenom);
 					}
 				}
 			}	
@@ -302,14 +304,14 @@ void demi_freres (Individu **l, int taille,char *prenom){
 			if (cur->pere != NULL){
 				if(l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)==0){
 					if (cur->mere != NULL && l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)!=0){
-						printf("%s\n",l[i]->prenom);
+						printf("\t%s\n",l[i]->prenom);
 					}
 				}
 			}	
 			if (cur->pere != NULL){
 				if(l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)!=0){
 					if (cur->mere != NULL && l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)==0){
-						printf("%s\n",l[i]->prenom);
+						printf("\t%s\n",l[i]->prenom);
 					}
 				}
 			}	
@@ -331,14 +333,14 @@ void demi_soeurs (Individu **l, int taille,char *prenom){
 			if (cur->pere != NULL){
 				if(l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)==0){
 					if (cur->mere != NULL && l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)!=0){
-						printf("%s\n",l[i]->prenom);
+						printf("\t%s\n",l[i]->prenom);
 					}
 				}
 			}	
 			if (cur->pere != NULL){
 				if(l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)!=0){
 					if (cur->mere != NULL && l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)==0){
-						printf("%s\n",l[i]->prenom);
+						printf("\t%s\n",l[i]->prenom);
 					}
 				}
 			}	
@@ -390,4 +392,59 @@ void tantes (Individu **l, int taille,char *prenom){
 
 void cousins (Individu **l, int taille,char *prenom){
 	/** donne les nom des tout les cousins de l'individu */
+	//coté paternel
+	int i,j;
+	Individu *cur;
+	for (i=0;i<taille;i++){
+		if (mystrcmp(l[i]->prenom,prenom)==0){
+			if (l[i]->pere != NULL){
+				for(j=0;j<taille;j++){
+					if(mystrcmp(l[j]->prenom,l[i]->pere->prenom)==0){
+						cur = l[j];
+					}
+				}
+			}
+			else{
+				printf("pere inconnu\n");
+			}
+		}
+	}
+	
+	if(cur->pere != NULL){
+		for(i=0;i<taille;i++){
+			if(l[i]->pere != NULL && mystrcmp(l[i]->prenom,cur->prenom)!=0 && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)==0) {
+				enfants(l,taille,l[i]->prenom);
+			}
+		}
+	}
+	else{
+		printf("oncles et tantes paternels inconnus\n");
+	}
+	
+	//coté maternel
+	for (i=0;i<taille;i++){
+		if (mystrcmp(l[i]->prenom,prenom)==0){
+			if (l[i]->mere != NULL){
+				for(j=0;j<taille;j++){
+					if(mystrcmp(l[j]->prenom,l[i]->mere->prenom)==0){
+						cur = l[j];
+					}
+				}
+			}
+			else{
+				printf("mere inconnue\n");
+			}
+		}
+	}
+	
+	if(cur->mere != NULL){
+		for(i=0;i<taille;i++){
+			if(l[i]->mere != NULL && mystrcmp(l[i]->prenom,cur->prenom)!=0 && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)==0) {
+				enfants(l,taille,l[i]->prenom);
+			}
+		}
+	}
+	else{
+		printf("oncles et tantes maternels inconnus\n");
+	}
 }
