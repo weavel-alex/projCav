@@ -67,6 +67,7 @@ Individu **toutLesIndividus (List *l, int *taille){
 }
 
 void MAJToutLesIndividus(List *l, Individu ***tab, int *taille){
+	/**Met a jour le tableau de tout les individus de l'arbre*/
 	*(tab) = NULL;
 	*(tab) = toutLesIndividus(l,taille);
 }
@@ -292,7 +293,15 @@ void load (char *nom_fichier, List *l){
 				}				
 				ptr++;fin_mot = 0;
 				if(ptr == 4){
-					//On cree l'individu
+					//On cree l'individu et ses parents s'ils n'existent pas
+					if(indv[2] != NULL && !existe(tab,nbInd,indv[2])){
+						new(l,indv[2],'m',NULL,NULL,tab,nbInd);
+						tab = toutLesIndividus(l,&nbInd);
+					}
+					if(indv[3] != NULL && !existe(tab,nbInd,indv[3])){
+						new(l,indv[3],'f',NULL,NULL,tab,nbInd);
+						tab = toutLesIndividus(l,&nbInd);
+					}
 					new(l,indv[0],indv[1][0],indv[2],indv[3],tab,nbInd);
 					tab = toutLesIndividus(l,&nbInd);
 					ptr=0;taille_mot=20;
@@ -329,14 +338,15 @@ char **commande(char *cmd, int *new_nb_arg){
 		//taille_mot -> la taille du mot en cours de contruction
 		//taille_arg -> le nombre d'argument de base, ici 5 car au max 5 args
 	int i,nb_arg=0,j=0,taille_mot=10,taille_arg=5;
-	
+	int taille_cmd = strlen(cmd);
 	char **fct = malloc(sizeof(char*)*taille_arg);
 	for(i=0;i<taille_arg;i++){
 		fct[i] = (char *)malloc(sizeof(char)*taille_mot);
 	}
-	for(i=0;i<strlen(cmd);i++){
+	for(i=0;i<taille_cmd;i++){
 		if(cmd[i] != ' '){
-			if(estLettre(cmd[i]) || (j != 0 && cmd[i] == '-')){
+			if(estLettre(cmd[i]) || (j != 0 && (cmd[i] == '-' || cmd[i] == '.'))){
+				//Nom composé avec un - ou pour les fichiers
 				fct[nb_arg][j] = cmd[i];
 				j++;
 				if(j == taille_mot){
@@ -361,7 +371,7 @@ char **commande(char *cmd, int *new_nb_arg){
 				}
 				nb_arg++;j=0;
 			}
-			if(cmd[i] == ')'){
+			if(cmd[i] == ')' || i == taille_cmd){
 				if(mystrcmp(fct[nb_arg],"null") == 0){
 					fct[nb_arg] = NULL;
 				}
@@ -394,6 +404,7 @@ char **commande(char *cmd, int *new_nb_arg){
 }
 
 void interface (List *indiv, Individu **listIndiv, int taille){
+	/**Gestion de l'interface utilisateur*/
 	int *nb_arg = malloc(sizeof(int));
 	*nb_arg = 5;
 	char *cmd_u = malloc(sizeof(char));
@@ -445,69 +456,66 @@ void interface (List *indiv, Individu **listIndiv, int taille){
 					MAJToutLesIndividus(indiv,&listIndiv,&taille);
 				} else {
 					printf("Individu deja existant.\n");
-					viderBuffer();
 				}
+				viderBuffer();
 			}
-		}else if (mystrcmp(ma_cmd[0],"info")==0){
+		} else if (mystrcmp(ma_cmd[0],"info")==0){
 			info(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"mere")==0){
+		} else if (mystrcmp(ma_cmd[0],"mere")==0){
 			mere(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"pere")==0){
+		} else if (mystrcmp(ma_cmd[0],"pere")==0){
 			pere(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"parents")==0){
+		} else if (mystrcmp(ma_cmd[0],"parents")==0){
 			parents(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"gdperes")==0){
+		} else if (mystrcmp(ma_cmd[0],"gdperes")==0){
 			gd_peres(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();	
-		}else if (mystrcmp(ma_cmd[0],"gdmeres")==0){
+		} else if (mystrcmp(ma_cmd[0],"gdmeres")==0){
 			gd_meres(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();	
-		}else if (mystrcmp(ma_cmd[0],"gdparents")==0){
+		} else if (mystrcmp(ma_cmd[0],"gdparents")==0){
 			gd_parents(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"ascendants")==0){
+		} else if (mystrcmp(ma_cmd[0],"ascendants")==0){
 			ascendants(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"enfants")==0){
+		} else if (mystrcmp(ma_cmd[0],"enfants")==0){
 			enfants(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"petitenfants")==0){
+		} else if (mystrcmp(ma_cmd[0],"petitenfants")==0){
 			petits_enfant(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"descendants")==0){
+		} else if (mystrcmp(ma_cmd[0],"descendants")==0){
 			descendants(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"partenaires")==0){
+		} else if (mystrcmp(ma_cmd[0],"partenaires")==0){
 			partenaires(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"freres")==0){
+		} else if (mystrcmp(ma_cmd[0],"freres")==0){
 			freres(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"soeurs")==0){
+		} else if (mystrcmp(ma_cmd[0],"soeurs")==0){
 			soeurs(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"oncles")==0){
+		} else if (mystrcmp(ma_cmd[0],"oncles")==0){
 			oncles(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"tantes")==0){
+		} else if (mystrcmp(ma_cmd[0],"tantes")==0){
 			tantes(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"demisoeurs")==0){
+		} else if (mystrcmp(ma_cmd[0],"demisoeurs")==0){
 			demi_soeurs(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-		}else if (mystrcmp(ma_cmd[0],"demifreres")==0){
+		} else if (mystrcmp(ma_cmd[0],"demifreres")==0){
 			demi_freres(listIndiv,taille,ma_cmd[1]);
-			viderBuffer();
-			
-		}else if (mystrcmp(ma_cmd[0],"cousins")==0){
+			viderBuffer();	
+		} else if (mystrcmp(ma_cmd[0],"cousins")==0){
 			cousins(listIndiv,taille,ma_cmd[1]);
 			viderBuffer();
-			
-			
 		} else {
 			if(mystrcmp(ma_cmd[0], "exit") != 0)
 				printf("Aucune option reconnue\n");
@@ -521,11 +529,6 @@ void interface (List *indiv, Individu **listIndiv, int taille){
 	free(cmd_u);
 	free(nb_arg);
 }
-
-/*	else if(mystrcmp(ma_cmd[0], "cousins") == 0){
-			cousins(ma_cmd[1]);
-		}*/
-
 
 int main(void){
 	List *l = nouvelleListe();

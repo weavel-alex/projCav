@@ -1,6 +1,7 @@
 #include "affichage.h"
 
 void view (List *l, Individu **tab, int taille){
+	/**Affiche tout l'arbre*/
 	int i;
 	for(i=0;i<taille;i++){
 		afficherIndividu(tab[i]);
@@ -148,21 +149,14 @@ void ascendants (Individu **l, int taille,char *prenom){
 void enfants (Individu **l, int taille,char *prenom){
 	/** donne les noms des enfants de l'individu */
 	int i;
-	int aP=0;
 	for(i=0;i<taille;i++){
 		if (l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,prenom)==0){
 			printf("\t%s\n",l[i]->prenom);
-			aP=1;
 		}
 		if (l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,prenom)==0){
 			printf("\t%s\n",l[i]->prenom);
-			aP=1;
 		}
 	}
-	/*
-	if(!aP)
-		printf("%s: Aucun enfant\n",prenom);
-	*/
 }
 
 void petits_enfant (Individu **l, int taille,char *prenom){
@@ -248,7 +242,7 @@ void partenaires (Individu **l, int taille,char *prenom){
 
 void freres (Individu **l, int taille,char *prenom){
 	/** donne les noms de tout les freres de l'individu */
-	int i=0;
+	int i;
 	Individu *cur;
 	for(i=0;i<taille;i++){
 		if (mystrcmp(prenom,l[i]->prenom)==0){
@@ -270,7 +264,7 @@ void freres (Individu **l, int taille,char *prenom){
 
 void soeurs (Individu **l, int taille,char *prenom){
 	/** donne les noms de toutes les soeurs de l'individu */
-	int i=0;
+	int i;
 	Individu *cur;
 	for(i=0;i<taille;i++){
 		if (mystrcmp(prenom,l[i]->prenom)==0){
@@ -292,7 +286,7 @@ void soeurs (Individu **l, int taille,char *prenom){
 
 void demi_freres (Individu **l, int taille,char *prenom){
 	/** donne les noms de tout les demi-freres de l'individu */
-	int i=0;
+	int i;
 	Individu *cur;
 	for(i=0;i<taille;i++){
 		if (mystrcmp(prenom,l[i]->prenom)==0){
@@ -321,7 +315,7 @@ void demi_freres (Individu **l, int taille,char *prenom){
 
 void demi_soeurs (Individu **l, int taille,char *prenom){
 	/** donne les noms de toutes les demi-soeurs de l'individu */
-	int i=0;
+	int i;
 	Individu *cur;
 	for(i=0;i<taille;i++){
 		if (mystrcmp(prenom,l[i]->prenom)==0){

@@ -17,6 +17,7 @@ int mystrcmp(char *s, char *ch){
 }
 
 void viderBuffer(){
+	/**Vide le buffer*/
 	int c;
 	do {
 		c = getchar();
@@ -24,24 +25,29 @@ void viderBuffer(){
 }
 
 int estMinuscule(char c){
+	/**Renvoi vrai si le caractere est minuscule*/
 	return (c >= 'a' && c <= 'z');
 }
 
 int estMajuscule(char c){
+	/**Renvoi vrai si le caractere est majuscule*/
 	return (c >= 'A' && c <= 'Z');
 }
 
 int estLettre(char c){
+	/**Renvoi vrai si le caractere est une lettre*/
 	return estMajuscule(c) || estMinuscule(c);
 }
 
 FILE* ouvrirFichier(char* nom, char* option){
+	/**Ouvre un fichier et le renvoi*/
 	FILE* fichier = NULL;
 	fichier = fopen(nom,option);
 	return fichier;
 }
 
 void fermerFichier(FILE* fichier){
+	/**Ferme le fichier*/
 	fclose(fichier);
 	fichier=NULL;
 }

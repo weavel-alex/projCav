@@ -1,6 +1,7 @@
 #include "listeCh.h"
 
 List *nouvelleListe(){
+	/**Cree une nouvelle liste chainee*/
 	List *l = NULL;
 	l = malloc(sizeof(*l));
 	l->premier = NULL;
