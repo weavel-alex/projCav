@@ -11,7 +11,7 @@ void MAJToutLesIndividus(List *l, Individu ***tab, int *taille);
 void new(List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere, Individu **tab, int nbInd);
 
 //Utilisation fichier
-void save(char *nom_fichier,List *l);
+void save(char *nom_fichier,List *l, Individu **tab, int taille);
 void load(char *nom_fichier, List *l);
 	
 //Interface utilisateur

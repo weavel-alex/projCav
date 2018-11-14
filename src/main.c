@@ -62,6 +62,7 @@ Individu **toutLesIndividus (List *l, int *taille){
 			}
 		}
 	}
+	free(actuel);
 	return tab;
 }
 
@@ -227,7 +228,7 @@ void new (List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere
 	}
 }
 
-void save (char *nom_fichier,List *l){
+void save (char *nom_fichier,List *l, Individu **tab, int taille){
 	/** sauvegarde l'arbre en memoire dans le fichier 'nom_fichier' */
 	FILE* fichierD = fopen(nom_fichier,"a");
 	if(fichierD != NULL){
@@ -235,10 +236,8 @@ void save (char *nom_fichier,List *l){
 	}
 	FILE *fichier = ouvrirFichier(nom_fichier,"a");
 	if(fichier != NULL){
-		int *taille = malloc(sizeof(int));
-		Individu **tab = toutLesIndividus(l, taille);
 		int i;
-		for(i=(*taille)-1;i>=0;i--){
+		for(i=taille-1;i>=0;i--){
 			if(tab[i]->pere != NULL && tab[i]->mere != NULL){
 				fprintf(fichier,"%s:%c,%s,%s\n",tab[i]->prenom,tab[i]->sexe,tab[i]->pere->prenom,tab[i]->mere->prenom);
 			} else {
@@ -421,7 +420,7 @@ void interface (List *indiv, Individu **listIndiv, int taille){
 			viderBuffer();
 			MAJToutLesIndividus(indiv,&listIndiv,&taille);
 		} else if(mystrcmp(ma_cmd[0], "save") == 0){
-			save(ma_cmd[1],indiv);
+			save(ma_cmd[1],indiv,listIndiv,taille);
 		} else if(ma_cmd[1] == NULL){
 			printf("Prenom non valide\n");
 			viderBuffer();
@@ -509,63 +508,16 @@ void interface (List *indiv, Individu **listIndiv, int taille){
 				printf("Aucune option reconnue\n");
 		}
 	}
+	int i;
+	for(i=0;i<(*nb_arg);i++){
+		free(ma_cmd[i]);
+	}
+	free(ma_cmd);
+	free(cmd_u);
+	free(nb_arg);
 }
 
-/*else if(mystrcmp(ma_cmd[0], "info") == 0){
-			info(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "mere") == 0){
-			mere(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "pere") == 0){
-			pere(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "parents") == 0){
-			parents(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "gdmeres") == 0){
-			gd_meres(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "gdperes") == 0){
-			gd_peres(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "gdparents") == 0){
-			gd_parents(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "ascendants") == 0){
-			ascendants(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "enfants") == 0){
-			enfants(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "petitsenfants") == 0){
-			petits_enfant(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "descendants") == 0){
-			descendants(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "partenaires") == 0){
-			partenaires(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "freres") == 0){
-			freres(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "soeurs") == 0){
-			soeurs(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "demifreres") == 0){
-			demi_freres(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "demisoeurs") == 0){
-			demi_soeurs(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "oncles") == 0){
-			oncles(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "tantes") == 0){
-			tantes(ma_cmd[1]);
-		}
-		else if(mystrcmp(ma_cmd[0], "cousins") == 0){
+/*	else if(mystrcmp(ma_cmd[0], "cousins") == 0){
 			cousins(ma_cmd[1]);
 		}*/
 
@@ -575,6 +527,12 @@ int main(void){
 	Individu **indv = malloc(sizeof(*indv));
 	int taille = 0;
 	interface(l,indv,taille);
+	int i;
+	for(i=taille-1;i>=0;i++){
+		free(indv[i]);
+	}
+	free(indv);
+	free(l);
 	
 	/*new(l,"A",'m',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
 	new(l,"B",'f',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
@@ -588,53 +546,29 @@ int main(void){
 	new(l,"W",'f',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
 	new(l,"Y",'f',"Z","W",indv,taille);MAJToutLesIndividus(l,&indv,&taille);
 	view(l);printf("\n");
+	*/
+	
+	/*new(l,"A",'m',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
+	new(l,"B",'f',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
+	new(l,"C",'m',"A",NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
+	ListNode *actuel = l->premier;
+	while(actuel != NULL){
+		printf("%s %p %p\n",actuel->individu->prenom, actuel->individu, actuel);
+		actuel = actuel->next;
+	}
+	int i;
+	for(i=0;i<taille;i++){
+		printf("%s %p\n",indv[i]->prenom, indv[i]);
+	}
+	view(l,indv,taille);
 	
 	viderListe(&l);
-	MAJToutLesIndividus(l,&indv,&taille);
-
-	load("test.txt",l);
-	MAJToutLesIndividus(l,&indv,&taille);
 	
-	new(l,"z",'m',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	view(l);printf("\n");
+	save("teest22222",l,indv,taille);
 	*/
-	/*int w;
-	for(w=0;w<taille;w++){
-		afficherIndividu(indv[w]);
-	}
-	
-	ListNode *actuel = l->premier;
-	while(actuel->next != NULL){
-		actuel = actuel->next;
-	}
-	ListNode *node = malloc(sizeof(*node));
-	Individu *ind = initialisationIndividu();
-	ind->prenom = malloc(sizeof(char)*strlen("z"));
-	strcpy(ind->prenom,"z");
-	ind->sexe = 'f';
-	node->individu = ind;
-	node->next = actuel->next;
-	
-	actuel->next = node;
-	
-	printf("-\n");
-	actuel = l->premier;
-	while(actuel != NULL){
-		afficherIndividu(actuel->individu);
-		actuel = actuel->next;
-	}*/
-	
-	
-	//view(l);printf("\n");
-	
-	//new(l,"Y",'f',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	//view(l);printf("\n");
-	
-	
-	//view(l);printf("\n");
 	
 	/*char **ma_cmd;
-	char c[19] = "new(bru,f,tre,pro)";
+	char c[9] = "freres(a";
 	int *t = malloc(sizeof(int));*t=5;
 	ma_cmd=commande(c,t);
 	int i;
@@ -644,22 +578,5 @@ int main(void){
 		else	
 			printf("%s\n",ma_cmd[i]);
 	}*/
-	
-	/*
-	new(l,"A",'m',NULL,NULL);
-	view(l);printf("\n");
-	new(l,"B",'f',NULL,NULL);
-	view(l);printf("\n");
-	new(l,"C",'m',"A","B");
-	view(l);printf("\n");
-	new(l,"D",'f',"A","B");
-	view(l);printf("\n");
-	new(l,"E",'f',"C","D");
-	view(l);printf("\n");
-	*/
-
-	//save("test.txt",l);
-	//load("test.txt",l);
-	//view(l);
 	return 0;
 }
