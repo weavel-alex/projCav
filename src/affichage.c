@@ -297,7 +297,7 @@ void demi_freres (Individu **l, int taille,char *prenom){
 		if (l[i]->sexe == 'm' && mystrcmp(l[i]->prenom,cur->prenom)!=0){
 			if (cur->pere != NULL){
 				if(l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)==0){
-					if (cur->mere != NULL && l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)!=0){
+					if (cur->mere != NULL && (l[i]->mere == NULL || mystrcmp(l[i]->mere->prenom,cur->mere->prenom)!=0)){
 						printf("\t%s\n",l[i]->prenom);
 					}
 				}
@@ -326,7 +326,7 @@ void demi_soeurs (Individu **l, int taille,char *prenom){
 		if (l[i]->sexe == 'f' && mystrcmp(l[i]->prenom,cur->prenom)!=0){
 			if (cur->pere != NULL){
 				if(l[i]->pere != NULL && mystrcmp(l[i]->pere->prenom,cur->pere->prenom)==0){
-					if (cur->mere != NULL && l[i]->mere != NULL && mystrcmp(l[i]->mere->prenom,cur->mere->prenom)!=0){
+					if (cur->mere != NULL && (l[i]->mere == NULL || mystrcmp(l[i]->mere->prenom,cur->mere->prenom)!=0)){
 						printf("\t%s\n",l[i]->prenom);
 					}
 				}
