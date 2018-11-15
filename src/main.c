@@ -540,7 +540,7 @@ int main(void){
 		free(indv[i]);
 	}
 	free(indv);
-	free(l);
+	//free(l);
 	
 	/*new(l,"A",'m',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
 	new(l,"B",'f',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
