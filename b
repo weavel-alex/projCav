@@ -1,0 +1,15 @@
+sylvie:f,,
+sabine:f,leon,patricia
+thierry:m,jose,sylvie
+patricia:f,,
+leon:m,,
+megane:f,jose,sylvie
+joey:m,,
+tanya:f,,
+jose:m,,
+jonas:m,leon,
+gother:m,thierry,sabine
+jean-charles:m,leon,patricia
+bakari:m,joey,megane
+henri:m,jose,tanya
+lilou:f,jose,tanya

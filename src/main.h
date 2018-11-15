@@ -17,4 +17,6 @@ void load(char *nom_fichier, List *l);
 //Interface utilisateur
 char **commande(char *cmd, int *new_nb_arg);
 void interface(List *indiv, Individu **listIndiv, int taille);
+
+int main(void);
 #endif

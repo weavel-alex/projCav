@@ -1,0 +1,221 @@
+	Projet C avancé 2018
+	Arbre Genealogique	
+	
+ELSAESSER Quentin
+BASTIEN Alexandre
+
+*** NOTICE D'UTILISATION ***
+
+commandes:
+
+	exit
+		quitte l'application
+
+	load(nom_fichier)
+		vide la memoire et charge les données du fichier nom_fichier
+		
+	save(nom_fichier)
+		ecrit dans le fichier nom_fichier l'arbre en memoire
+
+	view
+		affiche l'arbre en memoire
+		
+	
+	info(prenom)
+		affiche les informations sur l'individu prenom (si il existe)
+	
+	new(prenom,sexe,prenom_pere,prenom_mere)
+		ajoute un individu dans l'arbre,
+		le sexe est soit 'm',soit 'f'
+		si les deux parents sont inconnus:
+			tapper new(prenom,sexe) ou new(prenom,sexe,NULL,NULL) ou new(prenom,sexe,,)
+		si un seul des parents inconnu laisser le champ vide
+			(ex: new(prenom,m,,prenom_mere))
+			
+	pere(prenom)
+		affiche le prenom du pere de prenom
+	
+	mere(prenom)
+		affiche le prenom de la mere de prenom
+		
+	parents(prenom)
+		affiche les prenoms des parents de prenom
+		
+	gdperes(prenom)
+		affiche les prenoms des grand-peres de prenom
+	
+	gdmeres(prenom)
+		affiche les prenoms des grand-meres de prenom
+	
+	gdparents(prenom)
+		affiche les prenoms des grands-parents de prenom
+	
+	ascendants(prenom)
+		affiche les prenoms des ascendants de prenom (peres,grands peres,arriere grand-peres etc)
+	
+	enfants(prenom)
+		affiche les prenoms des enfants de prenom
+	
+	petitenfants(prenom)
+		affiche les prenoms des petit-enfants de prenom
+	
+	descendants(prenom)
+		affiche les prenoms des pdescendants de prenom
+	
+	partenaires(prenom)
+		affiche les prenom des partenaires de prenom
+			(->partenaires si enfants en commun)
+	
+	freres(prenom)
+		affiche les prenoms des freres de prenom
+	
+	soeurs(prenom)
+		affiche les prenoms des soeurs de prenom
+	
+	demi_freres(prenom)
+		affiche les prenoms des demi-freres de prenom
+	
+	demi_soeurs(prenom)
+		affiche les prenoms des demi-soeurs de prenom
+	
+	cousins(prenom)
+		affiche les prenoms des cousins de prenom
+
+*** Explication du programme ***
+	
+	Separation du code pour meilleur lisibilité
+
+fctSimple.c / fctSimple.h
+	
+Regroupe les fonctions basiques utiles au programme.
+Fonction :
+	int mystrcmp(char *s, char *ch);
+		Compare deux chaines de caracteres en ignorant la casse
+		
+	void viderBuffer();
+		Vide le buffer
+		
+	int estMinuscule(char c);
+		Renvoi vrai si le caractere est minuscule
+		
+	int estMajuscule(char c);
+		Renvoi vrai si le caractere est majuscule
+		
+	int estLettre(char c);
+		Renvoi vrai si le caractere est une lettre
+		
+	FILE* ouvrirFichier(char* nom, char* option);
+		Ouvre un fichier et le retourne
+		
+	void fermerFichier(FILE* fichier);
+		Ferme le fichier
+		
+individu.c / individu.h
+
+	Structure d'un individu avec son prenom, sexe et ses parents:
+	struct _Individu {
+		char *prenom;
+		char sexe;
+		struct _Individu *pere;
+		struct _Individu *mere;
+	};
+	typedef struct _Individu Individu;
+		
+	Fonction :
+	Individu *initialisationIndividu();
+		Initialise un individu
+		
+	Individu *copieIndividu(Individu *ind);
+		Copie un individu
+		
+	void afficherIndividu(Individu *ind);
+		Affiche un individu (prenom:sexe,prenom_pere,prenom_mere)
+		
+	int existe(Individu **l, int taille, char *prenom);
+		Renvoi vrai si l'individu avec le prenom prenom existe
+		
+	void modificationPrenom(char *prenom, char *new_prenom, Individu **l, int taille);
+	Modifie le prenom de 'individu prenom
+	
+listeCh.c / listeCh.h
+
+	Structure de la liste chainée ou seront stocké les individus sans parents
+	Un mallon contient un individu et le suivant dans la liste :
+	typedef struct S_ListNode{
+		Individu *individu;
+		struct S_ListNode *next;
+	} ListNode;
+
+	La Liste contient le premier element de la liste chainée:
+	typedef struct{
+		ListNode *premier;
+	} List;
+	
+	Fonction :
+	List *nouvelleListe();
+		Initialise la tête de liste chainée
+		
+	void viderListe(List **l);
+		Vide la liste et initialise une nouvelle a la place de l'ancienne (utile lorsqu'un fichier est chargé)
+		
+affichage.c / affichage.h
+
+	Regroupe toutes les fonctions d'affiches détaillées plus haut
+	Si aucun individu est trouvé, affichage soit un message soit passe a la commande suivante.
+	
+	Entête des fonctions :
+	
+	void view(List *l, Individu **tab, int taille);
+	void info(Individu **l, int taille, char *prenom);
+	void pere(Individu **l, int taille,char *prenom);
+	void mere(Individu **l, int taille,char *prenom);
+	void parents(Individu **l, int taille,char *prenom);
+	void gd_peres(Individu **l, int taille,char *prenom);
+	void gd_meres(Individu **l, int taille, char *prenom);
+	void gd_parents(Individu **l, int taille, char *prenom);
+	void ascendants(Individu **l, int taille,char *prenom);
+	void enfants(Individu **l, int taille,char *prenom);
+	void petits_enfant(Individu **l, int taille,char *prenom);
+	void descendants(Individu **l, int taille,char *prenom);
+	void partenaires(Individu **l, int taille,char *prenom);
+	void freres(Individu **l, int taille,char *prenom);
+	void soeurs(Individu **l, int taille,char *prenom);
+	void demi_freres(Individu **l, int taille,char *prenom);
+	void demi_soeurs(Individu **l, int taille,char *prenom);
+	void oncles(Individu **l, int taille,char *prenom);
+	void tantes(Individu **l, int taille,char *prenom);
+	void cousins(Individu **l, int taille,char *prenom);
+	
+main.c / main.h
+
+	Contient les dernieres fonctions du programme ainsi que le main.
+	
+	Individu **toutLesIndividus(List *l, int *taille);
+		Retourne un tableau contenant tout les individus de l'arbre sans les doublons.
+		
+	void MAJToutLesIndividus(List *l, Individu ***tab, int *taille);
+		Met a jour le tableau contenant tout les individus.
+		
+	void new(List *l, char *prenom, char sexe, char *prenom_pere, char *prenom_mere, Individu **tab, int nbInd);
+		Cree un nouvel individu et le place dans la liste chainee en le placant en tête de liste.
+		Dans le cas ou au moins un des parents est renseignés, enleve les parents de la liste chainée s'ils sont toujours dedans et ajoute ensuite le maillon dans la liste chainée avec un pointeur vers les parents.
+		Dans le cas ou la liste contient un seul élément qui est le parent du nouvel individu, on ajoute d'abord l'individu dans la liste avant d'enlever le parent restant pour ne pas perdre la liste.
+		Si les parents ne sont pas dans la liste chainée alors on les cherches dans le tableau d'individu.
+
+	void save(char *nom_fichier,List *l, Individu **tab, int taille);
+		Sauvegarde l'arbre en memoire dans le fichier nom_fichier.
+		Sauvegarde dans le fichier sera similaire a l'affichage (dans l'ordre inverse pour ajouter d'abord les parents)
+
+	void load(char *nom_fichier, List *l);
+		Charge l'arbre donné dans le fichier
+	
+	char **commande(char *cmd, int *new_nb_arg);
+		Retourne un tableau avec le nom de la commande entré par l'utilisateur et les paramètres. S'il ne contient rien rempli de NULL
+		
+	void interface(List *indiv, Individu **listIndiv, int taille);
+		Gestion de l'interface pour l'utilisateur, recupere ce que l'utilisateur entre dans la console et lance la commande voulu.
+	
+	int main(void);
+		Cree la liste
+		Cree le tableau d'individu
+		lance la fonction pour l'interface utilisateur

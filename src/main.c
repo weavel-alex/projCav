@@ -540,51 +540,5 @@ int main(void){
 		free(indv[i]);
 	}
 	free(indv);
-	//free(l);
-	
-	/*new(l,"A",'m',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	new(l,"B",'f',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	new(l,"C",'m',"A","B",indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	new(l,"D",'f',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	new(l,"E",'f',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	new(l,"F",'m',"C","D",indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	new(l,"G",'m',"C","D",indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	new(l,"H",'m',"C","E",indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	new(l,"Z",'m',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	new(l,"W",'f',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	new(l,"Y",'f',"Z","W",indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	view(l);printf("\n");
-	*/
-	
-	/*new(l,"A",'m',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	new(l,"B",'f',NULL,NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	new(l,"C",'m',"A",NULL,indv,taille);MAJToutLesIndividus(l,&indv,&taille);
-	ListNode *actuel = l->premier;
-	while(actuel != NULL){
-		printf("%s %p %p\n",actuel->individu->prenom, actuel->individu, actuel);
-		actuel = actuel->next;
-	}
-	int i;
-	for(i=0;i<taille;i++){
-		printf("%s %p\n",indv[i]->prenom, indv[i]);
-	}
-	view(l,indv,taille);
-	
-	viderListe(&l);
-	
-	save("teest22222",l,indv,taille);
-	*/
-	
-	/*char **ma_cmd;
-	char c[9] = "freres(a";
-	int *t = malloc(sizeof(int));*t=5;
-	ma_cmd=commande(c,t);
-	int i;
-	for(i=0;i<5;i++){
-		if(ma_cmd[i] == NULL)
-			printf("NULL\n");
-		else	
-			printf("%s\n",ma_cmd[i]);
-	}*/
 	return 0;
 }
